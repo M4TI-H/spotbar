@@ -14,4 +14,5 @@ export default defineNuxtConfig({
       unstyled: true,
     },
   },
+  components: true,
 });

@@ -9,12 +9,12 @@ const cities = ref([
   { name: "Wrocław", code: "WRO" },
   { name: "Łódź", code: "LDZ" },
 ]);
-
-const selectedLocation = ref<any>(null);
 </script>
 
 <template>
-  <div class="w-full min-h-screen flex flex-col bg-neutral-50">
+  <div
+    class="w-full min-h-screen flex flex-col items-center gap-8 bg-neutral-50"
+  >
     <section
       class="w-full flex flex-col-reverse sm:flex-row gap-2 sm:gap-4 justify-center items-start"
     >
@@ -33,5 +33,6 @@ const selectedLocation = ref<any>(null);
         />
       </div>
     </section>
+    <TestForm />
   </div>
 </template>
