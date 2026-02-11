@@ -5,20 +5,32 @@ const expand = ref<boolean>(false);
 const previews = ref<ImagePreview[]>([]);
 const isUploading = ref<boolean>(false);
 const uploadProgress = ref<number>(0);
+const files = ref<File[] | null>(null);
 
-const handleUpload = async (event: Event) => {
+const emit = defineEmits<{
+  (e: "upload", value: File[]): void;
+}>();
+
+const handleUploadPreview = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const fileList = target.files;
 
   if (!fileList || fileList.length === 0) return;
 
-  const files = Array.from(fileList);
+  const newFiles = Array.from(fileList);
+
+  if (!files.value) {
+    files.value = newFiles;
+  } else {
+    files.value = [...files.value, ...newFiles];
+  }
 
   isUploading.value = true;
   uploadProgress.value = 0;
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  for (let i = 0; i < newFiles.length; i++) {
+    const file = newFiles[i];
+
     if (!file) continue;
 
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -29,14 +41,19 @@ const handleUpload = async (event: Event) => {
     };
 
     previews.value.push(newImg);
-
-    uploadProgress.value = Math.round(((i + 1) / files.length) * 100);
+    uploadProgress.value = Math.round(((i + 1) / newFiles.length) * 100);
   }
-
   setTimeout(() => {
     isUploading.value = false;
     setTimeout(() => (uploadProgress.value = 0), 300);
   }, 800);
+};
+
+const handleEmitUpload = () => {
+  if (files.value) {
+    const validFiles = files.value.filter((f): f is File => f !== undefined);
+    emit("upload", validFiles);
+  }
 };
 
 onUnmounted(() => {
@@ -45,7 +62,7 @@ onUnmounted(() => {
 </script>
 <template>
   <section
-    :class="expand ? 'max-h-256' : 'max-h-96'"
+    :class="expand ? 'max-h-fit' : 'max-h-min'"
     class="relative w-full max-w-md flex flex-col p-4 gap-4 bg-gray-200 border border-gray-300 rounded-md overflow-hidden transition-all duration-100 ease-in-out"
   >
     <div class="flex flex-col gap-1">
@@ -60,7 +77,7 @@ onUnmounted(() => {
       <input
         type="file"
         multiple
-        @change="handleUpload"
+        @change="handleUploadPreview"
         class="hidden"
         accept="image/*"
       />
@@ -79,10 +96,19 @@ onUnmounted(() => {
           {{ uploadProgress }}%
         </span>
       </div>
+
+      <button
+        @click="handleEmitUpload"
+        v-if="previews.length > 0"
+        class="flex items-center justify-center w-full py-2 sm:py-3 text-sm text-gray-200 bg-gray-500 rounded-sm select-none hover:bg-gray-600/90 cursor-pointer transition-colors duration-200"
+      >
+        Convert to text
+      </button>
       <p v-if="previews.length > 0" class="text-sm text-gray-400 self-end mr-1">
         Selected images: {{ previews.length }}
       </p>
     </div>
+
     <template v-if="previews.length > 0">
       <div
         :class="expand ? 'overflow-auto' : 'overflow-hidden'"
