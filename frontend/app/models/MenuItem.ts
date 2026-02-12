@@ -1,7 +1,9 @@
 export default interface MenuItem {
-  id: number;
+  id: string;
   category: string;
   name: string;
   price?: number;
-  description?: string[];
+  ingredients?: string[];
+  description?: string;
+  section?: string;
 }

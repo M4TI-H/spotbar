@@ -13,9 +13,8 @@ async def receive_images(file: List[UploadFile] = File(...)):
 
     # process the images using Gemini and extract menu data
     try:
-        print("Próba wywołania process_menu_with_gemini...")
+        print("Extracting data using gemini.")
         extracted_data = await process_menu_with_gemini(file)
-        print("Sukces! Dane wyciągnięte pomyślnie.")
         return {
             "status": "success",
             "data": extracted_data

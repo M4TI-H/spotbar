@@ -15,7 +15,7 @@ async def process_menu_with_gemini(files: List[UploadFile]):
     Analizuj te zdjęcia menu. Wyciągnij wszystkie pozycje. 
     Zwróć dane WYŁĄCZNIE jako czysty JSON (lista obiektów).
     Zwróć tylko pozycje w języku angielskim.
-    Format: [{"id": "unikalny_id", "category": "kategoria (np. Coffee, Beer, Wine, Drink)", "name": "nazwa", "price": cena_jako_liczba, "ingredients": ["składniki jako tablica stringów"], "description": "opis (np. smak, aromat, itp.)"}, ...]
+    Format: [{"id": "unikalny_id", "category": "kategoria (np. Cocktail, Beer, Wine, Drink)", "name": "nazwa", "price": cena_jako_liczba, "volume": "pojemność (wartość liczbowa, zostaw puste jeśli brak informacji)", "ingredients": ["składniki jako tablica stringów"], "description": "opis (np. smak, aromat, itp.)"}, "section": "sekcja w menu, czyli na przykład alkohole mocne, wina (jeśli na zdjęciu nie ma nazwy sekcji, pozostaw puste)"]
     Nie dodawaj żadnych markdownowych znaczników typu ``` json.
     """
     
