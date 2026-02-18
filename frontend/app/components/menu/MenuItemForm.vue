@@ -1,82 +1,125 @@
 <script setup lang="ts">
+import type MenuItem from "~/models/MenuItem";
+
 const menuItemStore = useMenuItemStore();
 
 const isSimpleField = (value: any) => typeof value !== "object";
+
+const localData = ref<MenuItem | null>(null);
+
+const saveChanges = () => {
+  if (localData.value) {
+    menuItemStore.save(localData.value);
+  }
+};
+
+//initial values copy
+watch(
+  () => menuItemStore.data,
+  (newData) => {
+    if (newData) {
+      localData.value = JSON.parse(JSON.stringify(newData));
+    } else {
+      localData.value = null;
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
-  <section class="w-screen h-screen z-100 fixed bg-black/40">
+  <section
+    class="w-screen h-screen z-100 fixed bg-black/40 flex items-center justify-center p-4"
+  >
     <div
-      v-if="menuItemStore.data"
-      class="absolute w-full max-w-[96vw] sm:max-w-lg z-20 top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-white border border-gray-400 rounded-md p-4 flex flex-col gap-4"
+      v-if="localData"
+      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md shadow-2xl flex flex-col"
     >
       <div
-        class="flex items-center justify-between border-b border-gray-400 pb-2"
+        class="flex items-center justify-between px-4 py-4 border-b border-gray-200"
       >
-        <h1 class="text-lg font-semibold text-gray-700 truncate">
-          Editing: {{ menuItemStore.data.name }}
+        <h1 class="text-xl font-semibold text-gray-800">
+          Modifying {{ localData.name }}
         </h1>
-        <button
-          @click="menuItemStore.close()"
-          class="text-sm text-gray-400 hover:text-gray-500 cursor-pointer"
-        >
-          Close
-        </button>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <div v-for="(value, key) in menuItemStore.data" :key="key">
-          <div v-if="isSimpleField(value)" class="flex flex-col gap-1">
-            <label class="text-xs font-semibold uppercase text-gray-400 ml-1">
-              {{ key }}
-            </label>
+      <div class="p-4 overflow-y-auto max-h-[80vh]">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <template v-for="(value, key) in localData" :key="key">
+            <div
+              v-if="
+                isSimpleField(value) && key !== 'description' && key !== 'id'
+              "
+              class="flex flex-col gap-1"
+            >
+              <label
+                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
+                >{{ key }}</label
+              >
+              <input
+                v-model="localData[key]"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-emerald-500 focus:bg-white outline-0 transition-all text-sm text-gray-700"
+                type="text"
+              />
+            </div>
+          </template>
 
+          <div class="md:col-span-3 flex flex-col gap-1">
+            <label
+              class="text-[10px] font-bold uppercase text-gray-400 tracking-wider ml-1"
+              >Description</label
+            >
             <textarea
-              v-if="key === 'description'"
-              v-model="menuItemStore.data[key]"
-              class="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-0 transition-all h-24 text-sm resize-none"
-              :placeholder="key"
+              v-model="localData.description"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-emerald-500 focus:bg-white outline-0 transition-all h-20 text-sm resize-none"
+              placeholder="Describe this item..."
             ></textarea>
+          </div>
 
-            <input
-              v-else
-              v-model="menuItemStore.data[key]"
-              class="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 outline-0 transition-all"
-              type="text"
-              :placeholder="key"
-            />
+          <div
+            v-if="localData.ingredients"
+            class="md:col-span-3 flex flex-col gap-1"
+          >
+            <label
+              class="text-[10px] font-bold uppercase text-gray-400 tracking-wider ml-1"
+              >Ingredients</label
+            >
+            <textarea
+              :value="localData.ingredients.join(', ')"
+              @input="
+                (e) =>
+                  (localData!.ingredients = (
+                    e.target as HTMLTextAreaElement
+                  ).value
+                    .split(',')
+                    .map((s) => s.trim()))
+              "
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 h-16 text-sm resize-none"
+            ></textarea>
+          </div>
+
+          <div class="md:col-span-3 pt-2">
+            <button
+              class="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-200 text-gray-400 hover:border-emerald-300 hover:text-emerald-600 rounded-md transition-all text-xs font-semibold cursor-pointer w-fit"
+            >
+              <span>+</span> ADD CUSTOM ATTRIBUTE (GLASS, METHOD, ETC.)
+            </button>
           </div>
         </div>
       </div>
 
-      <div v-if="menuItemStore.data.ingredients" class="flex flex-col gap-2">
-        <label class="text-xs font-semibold uppercase text-gray-400 ml-1"
-          >Ingredients
-        </label>
-        <textarea
-          :value="menuItemStore.data.ingredients.join(', ')"
-          @input="
-            (e) =>
-              (menuItemStore.data!.ingredients = (
-                e.target as HTMLTextAreaElement
-              ).value
-                .split(',')
-                .map((s) => s.trim()))
-          "
-          class="w-full px-3 py-2 rounded-md border border-gray-300 outline-0 h-20 text-sm"
-        ></textarea>
-      </div>
-
-      <button
-        class="w-full py-2 border-2 border-dashed border-gray-300 text-gray-400 hover:border-emerald-400 hover:text-emerald-500 rounded-md transition-colors text-sm font-semibold cursor-pointer"
+      <div
+        class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3"
       >
-        + Add custom attribute (Glass, Method, etc.)
-      </button>
-
-      <div class="flex gap-2 mt-2">
         <button
-          @click="menuItemStore.save()"
-          class="flex-1 bg-emerald-600 text-white py-2 rounded-md hover:bg-emerald-700 transition-colors font-bold cursor-pointer"
+          @click="menuItemStore.close()"
+          class="px-6 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          @click="saveChanges"
+          class="px-8 py-2 bg-emerald-600 text-white rounded shadow-md hover:bg-emerald-700 transition-all font-semibold text-sm cursor-pointer"
         >
           Save Changes
         </button>

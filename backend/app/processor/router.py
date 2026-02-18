@@ -20,4 +20,5 @@ async def receive_images(file: List[UploadFile] = File(...)):
             "data": extracted_data
         }
     except Exception as e:
+        print(f"ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

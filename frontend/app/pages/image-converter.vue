@@ -4,7 +4,7 @@ import ProcessingLoading from "~/components/imageConverter/ProcessingLoading.vue
 import Menu from "~/components/menu/Menu.vue";
 import type MenuItem from "~/models/MenuItem";
 
-const menuItemsData = ref<MenuItem[]>();
+const menuStore = useMenuStore();
 const isProcessing = ref<boolean>(false);
 
 const uploadPhotos = async (files: File[]) => {
@@ -27,9 +27,9 @@ const uploadPhotos = async (files: File[]) => {
     );
 
     isProcessing.value = false;
-    menuItemsData.value = response.data;
+    menuStore.addToMenu(response.data);
 
-    console.log("Otrzymane menu:", menuItemsData.value);
+    console.log("Otrzymane menu:", response.data);
   } catch (error) {
     console.error(error);
   }
@@ -37,10 +37,10 @@ const uploadPhotos = async (files: File[]) => {
 </script>
 
 <template>
-  <div class="w-full min-h-screen flex gap-4 px-4">
+  <div class="w-full flex gap-4 px-4">
     <FileSelect @upload="uploadPhotos" />
 
-    <Menu v-if="menuItemsData" :menuItemsData="menuItemsData" />
+    <Menu v-if="menuStore.menu.length > 0" />
     <ProcessingLoading v-if="isProcessing" />
   </div>
 </template>

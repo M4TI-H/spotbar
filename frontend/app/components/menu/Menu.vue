@@ -1,32 +1,29 @@
 <script setup lang="ts">
 import type MenuItem from "~/models/MenuItem";
 
-const props = defineProps<{
-  menuItemsData: MenuItem[];
-}>();
-
+const menuStore = useMenuStore();
 const menuItemStore = useMenuItemStore();
 
 const activeCategory = ref<string>("all");
 const availableCurrencies = ["PLN", "EUR", "USD", "GBP"];
 
 const categories = computed(() => {
-  if (props.menuItemsData) {
-    return Array.from(
-      new Set(props.menuItemsData.map((item) => item.category)),
-    ).filter(Boolean);
-  }
+  const sections = menuStore.menu.map((item) => item.section || "Inne");
+  const unique = [...new Set(sections)];
+  return unique.filter((c) => c.toLowerCase() !== "all");
 });
 
 const filteredMenu = computed(() => {
-  if (!props.menuItemsData) return [];
+  const data = menuStore.menu;
+  if (!data) return [];
 
   if (activeCategory.value.toLowerCase() === "all") {
-    return props.menuItemsData;
+    return data;
   }
 
-  return props.menuItemsData.filter(
-    (item) => item.category === activeCategory.value,
+  return data.filter(
+    (item) =>
+      (item.section || "").toLowerCase() === activeCategory.value.toLowerCase(),
   );
 });
 
@@ -46,8 +43,8 @@ const groupedMenu = computed(() => {
 </script>
 <template>
   <div
-    v-if="menuItemsData"
-    class="w-full max-w-[96vw] sm:max-w-md lg:max-w-3xl h-min flex flex-col p-4 gap-8 border border-gray-400 rounded-md"
+    v-if="menuStore.menu"
+    class="w-full max-w-[96vw] sm:max-w-md lg:max-w-4xl h-min flex flex-col p-4 gap-8 border border-gray-400 rounded-md"
   >
     <div class="w-full flex items-center gap-2 overflow-x-auto pb-2">
       <button
@@ -55,7 +52,7 @@ const groupedMenu = computed(() => {
         :class="
           activeCategory === 'all'
             ? 'bg-gray-400 text-white'
-            : 'bg-transparent text-gray-600'
+            : 'bg-transparent text-gray-800'
         "
         class="py-2 px-4 border border-gray-400 rounded-md whitespace-nowrap cursor-pointer"
       >
@@ -68,7 +65,7 @@ const groupedMenu = computed(() => {
         :class="
           activeCategory === cat
             ? 'bg-gray-400 text-white'
-            : 'bg-transparent text-gray-600'
+            : 'bg-transparent text-gray-800'
         "
         class="py-2 px-4 border border-gray-400 rounded-md whitespace-nowrap cursor-pointer"
       >

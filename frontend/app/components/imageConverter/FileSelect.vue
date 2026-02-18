@@ -11,6 +11,15 @@ const emit = defineEmits<{
   (e: "upload", value: File[]): void;
 }>();
 
+//generates hash from image's content, used to prevent duplicates
+const generateFileHash = async (file: File): Promise<string> => {
+  const arrayBuffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-1", arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+};
+
+//handles file select, generates previews and validates duplicates
 const handleUploadPreview = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const fileList = target.files;
@@ -18,31 +27,38 @@ const handleUploadPreview = async (event: Event) => {
   if (!fileList || fileList.length === 0) return;
 
   const newFiles = Array.from(fileList);
-
-  if (!files.value) {
-    files.value = newFiles;
-  } else {
-    files.value = [...files.value, ...newFiles];
-  }
-
   isUploading.value = true;
   uploadProgress.value = 0;
 
   for (let i = 0; i < newFiles.length; i++) {
     const file = newFiles[i];
-
     if (!file) continue;
+
+    const fileHash = await generateFileHash(file);
+    if (!fileHash) {
+      console.error("Hash generation failed for", file.name);
+      continue;
+    }
+
+    const isDuplicate = previews.value.some((p) => p.hash === fileHash);
+    if (isDuplicate) {
+      console.warn("Duplicate file detected: ", file.name);
+      continue;
+    }
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     const newImg: ImagePreview = {
       file: file,
       url: URL.createObjectURL(file),
+      wasProcessed: false,
+      hash: fileHash,
     };
 
     previews.value.push(newImg);
     uploadProgress.value = Math.round(((i + 1) / newFiles.length) * 100);
   }
+
   setTimeout(() => {
     isUploading.value = false;
     setTimeout(() => (uploadProgress.value = 0), 300);
@@ -50,9 +66,17 @@ const handleUploadPreview = async (event: Event) => {
 };
 
 const handleEmitUpload = () => {
-  if (files.value) {
-    const validFiles = files.value.filter((f): f is File => f !== undefined);
-    emit("upload", validFiles);
+  const unprocessedPreviews = previews.value.filter((p) => !p.wasProcessed);
+
+  console.log(
+    "Files to be sent:",
+    unprocessedPreviews.map((p) => p.file.name),
+  );
+
+  if (unprocessedPreviews.length > 0) {
+    const filesToUpload = unprocessedPreviews.map((p) => p.file);
+    emit("upload", filesToUpload);
+    unprocessedPreviews.forEach((p) => (p.wasProcessed = true));
   }
 };
 

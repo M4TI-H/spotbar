@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { MenuItem } from "primevue/menuitem";
+import type MenuItem from "~/models/MenuItem";
 
 export const useMenuItemStore = defineStore("menuItem", {
   state: () => ({
@@ -16,9 +16,8 @@ export const useMenuItemStore = defineStore("menuItem", {
       this.isOpened = false;
       this.data = null;
     },
-    save() {
-      console.log("Changes saved.");
-      console.log(this.data);
+    save(passedData: MenuItem) {
+      this.data = passedData;
       this.close();
     },
   },
