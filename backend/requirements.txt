@@ -1,7 +1,8 @@
 fastapi
-uvicorn[standard]
+uvicorn
 sqlmodel
 psycopg2-binary
 python-dotenv
 python-multipart
 pydantic
+google-genai
