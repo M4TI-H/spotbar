@@ -10,10 +10,24 @@
       + Add new menu
     </button>
 
-    <div
+    <Tabs
+      value="0"
       class="flex flex-col w-full max-w-4xl p-6 rounded-md border border-gray-300"
     >
-      <div class="w-full h-12"></div>
-    </div>
+      <TabList>
+        <Tab value="0">All</Tab>
+        <Tab value="1">Beer</Tab>
+        <Tab value="2">Wine</Tab>
+        <Tab value="3">Drinks</Tab>
+      </TabList>
+      <TabPanels>
+        <TabPanel value="0">
+          <p>Hello</p>
+        </TabPanel>
+        <TabPanel value="1">
+          <p>Hi</p>
+        </TabPanel>
+      </TabPanels>
+    </Tabs>
   </div>
 </template>

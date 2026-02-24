@@ -85,18 +85,18 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <section
+  <div
     :class="expand ? 'max-h-fit' : 'max-h-min'"
-    class="relative w-full max-w-md flex flex-col p-4 gap-4 bg-gray-200 border border-gray-300 rounded-md overflow-hidden transition-all duration-100 ease-in-out"
+    class="relative w-full max-w-md flex flex-col gap-4 overflow-hidden transition-all duration-100 ease-in-out"
   >
-    <div class="flex flex-col gap-1">
-      <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Menu Scanner</h2>
+    <div class="flex flex-col">
+      <h2 class="sm:text-lg font-semibold text-gray-600">Image Scanner</h2>
       <p class="text-sm sm:text-base text-gray-400">
         Upload photos to create a digital version
       </p>
     </div>
     <label
-      class="flex items-center justify-center w-full py-2 sm:py-3 bg-gray-300 rounded-sm select-none hover:bg-gray-400/40 cursor-pointer transition-colors duration-200"
+      class="flex items-center justify-center w-full py-1 sm:py-2 bg-gray-100 border border-gray-300 rounded-md select-none hover:bg-gray-200 cursor-pointer transition-colors"
     >
       <input
         type="file"
@@ -124,7 +124,7 @@ onUnmounted(() => {
       <button
         @click="handleEmitUpload"
         v-if="previews.length > 0"
-        class="flex items-center justify-center w-full py-2 sm:py-3 text-sm text-gray-200 bg-gray-500 rounded-sm select-none hover:bg-gray-600/90 cursor-pointer transition-colors duration-200"
+        class="flex items-center justify-center w-full py-1 sm:py-2 text-sm text-gray-50 bg-gray-400 rounded-md select-none hover:bg-gray-500 cursor-pointer transition-colors"
       >
         Convert to text
       </button>
@@ -135,7 +135,7 @@ onUnmounted(() => {
 
     <template v-if="previews.length > 0">
       <div
-        :class="expand ? 'overflow-auto' : 'overflow-hidden'"
+        :class="expand ? 'max-h-80 overflow-auto' : 'max-h-64 overflow-hidden'"
         class="w-full grid grid-cols-2 sm:grid-cols-3 gap-2"
       >
         <img
@@ -143,16 +143,16 @@ onUnmounted(() => {
           :key="idx"
           :src="img.url"
           draggable="false"
-          class="h-full object-cover"
+          class="h-48 object-cover mx-auto"
         />
       </div>
       <div
-        v-if="previews.length > 0 && !expand"
-        class="absolute bottom-0 left-0 flex items-end justify-center p-1 w-full h-32 bg-linear-to-t from-gray-200 via-gray-200/90 to-transparent"
+        v-if="previews.length > 3 && !expand"
+        class="absolute bottom-0 left-0 flex items-end justify-center p-1 w-full h-32 bg-linear-to-t from-gray-100 via-gray-100/90 to-transparent"
       >
         <button
           @click="expand = true"
-          class="text-sm text-gray-400 hover:text-gray-500 transition-colors duration-200 cursor-pointer"
+          class="text-sm text-gray-300 hover:text-gray-400 transition-colors cursor-pointer"
         >
           Show all
         </button>
@@ -162,9 +162,9 @@ onUnmounted(() => {
     <button
       v-if="expand"
       @click="expand = false"
-      class="text-sm text-gray-400 hover:text-gray-500 transition-colors duration-200 cursor-pointer"
+      class="text-sm text-gray-300 hover:text-gray-400 transition-colors cursor-pointer"
     >
       Show less
     </button>
-  </section>
+  </div>
 </template>

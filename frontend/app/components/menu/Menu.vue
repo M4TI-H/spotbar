@@ -5,7 +5,6 @@ const menuStore = useMenuStore();
 const menuItemStore = useMenuItemStore();
 
 const activeCategory = ref<string>("all");
-const availableCurrencies = ["PLN", "EUR", "USD", "GBP"];
 
 const categories = computed(() => {
   const sections = menuStore.menu.map((item) => item.section || "Inne");
@@ -44,44 +43,33 @@ const groupedMenu = computed(() => {
 <template>
   <div
     v-if="menuStore.menu"
-    class="w-full max-w-[96vw] sm:max-w-md lg:max-w-4xl h-min flex flex-col p-4 gap-8 border border-gray-400 rounded-md"
+    class="w-full h-min flex flex-col px-4 py-3 gap-4 border border-gray-300 rounded-md"
   >
-    <div class="w-full flex items-center gap-2 overflow-x-auto pb-2">
+    <div class="w-full flex items-center overflow-x-auto pb-2">
       <button
         @click="activeCategory = 'all'"
-        :class="
-          activeCategory === 'all'
-            ? 'bg-gray-400 text-white'
-            : 'bg-transparent text-gray-800'
-        "
-        class="py-2 px-4 border border-gray-400 rounded-md whitespace-nowrap cursor-pointer"
+        class="relative px-4 pb-1 text-gray-600 whitespace-nowrap cursor-pointer"
       >
-        All
+        All items
+        <span
+          v-if="activeCategory === 'all'"
+          class="absolute bottom-0 left-0 w-full h-px bg-gray-600"
+        ></span>
       </button>
       <button
         v-for="(cat, idx) in categories"
         :key="idx"
         @click="activeCategory = cat"
-        :class="
-          activeCategory === cat
-            ? 'bg-gray-400 text-white'
-            : 'bg-transparent text-gray-800'
-        "
-        class="py-2 px-4 border border-gray-400 rounded-md whitespace-nowrap cursor-pointer"
+        class="relative px-4 pb-1 text-gray-600 whitespace-nowrap cursor-pointer"
       >
         {{ cat }}
+        <span
+          v-if="activeCategory === cat"
+          class="absolute bottom-0 left-0 w-full h-px bg-gray-600"
+        ></span>
       </button>
     </div>
-    <div class="w-full flex flex-col items-end gap-1">
-      <select
-        v-model="menuItemStore.defaultCurrency"
-        class="w-min px-3 py-2 rounded-md border border-gray-300 focus:border-emerald-600 outline-0 bg-white"
-      >
-        <option v-for="curr in availableCurrencies" :key="curr" :value="curr">
-          {{ curr }}
-        </option>
-      </select>
-    </div>
+
     <div class="flex flex-col gap-10">
       <div
         v-for="(items, sectionName) in groupedMenu"

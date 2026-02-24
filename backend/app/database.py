@@ -4,7 +4,13 @@ from sqlmodel import create_engine, Session
 
 load_dotenv()
 
-engine = create_engine(os.getenv("DATABASE_URL"), echo=True)
+database_url = os.environ.get("DATABASE_URL")
+
+if not database_url:
+    raise RuntimeError("DATABASE_URL is not set in .env file")
+
+engine = create_engine(database_url, echo=True)
+
 
 def get_session():
     with Session(engine) as session:

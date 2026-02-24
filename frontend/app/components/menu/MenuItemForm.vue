@@ -82,7 +82,7 @@ watch(
               >
               <input
                 v-model="localData[key]"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-emerald-500 focus:bg-white outline-0 transition-all text-sm text-gray-700"
+                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 transition-all text-sm text-gray-700"
                 type="text"
               />
             </div>
@@ -95,7 +95,7 @@ watch(
             >
             <textarea
               v-model="localData.description"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-emerald-500 focus:bg-white outline-0 transition-all h-20 text-sm resize-none"
+              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 transition-all h-20 text-sm resize-none"
               placeholder="Describe this item..."
             ></textarea>
           </div>
@@ -143,7 +143,7 @@ watch(
         </button>
         <button
           @click="saveChanges"
-          class="px-8 py-2 bg-emerald-600 text-white rounded shadow-md hover:bg-emerald-700 transition-all font-semibold text-sm cursor-pointer"
+          class="px-8 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-all font-semibold text-sm cursor-pointer"
         >
           Save Changes
         </button>

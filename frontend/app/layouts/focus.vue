@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import Navigation from "~/components/Navigation.vue";
+const menuItemStore = useMenuItemStore();
 </script>
 
 <template>
   <div class="relative">
-    <Navigation />
-    <div class="p-4 sm:px-12 bg-neutral-100">
+    <MenuItemForm v-if="menuItemStore.isOpened" />
+    <div class="p-4">
       <slot />
     </div>
   </div>

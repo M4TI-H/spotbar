@@ -9,7 +9,7 @@ router = APIRouter()
 async def receive_images(file: List[UploadFile] = File(...)):
     # file type validation
     for img in file:
-        if not img.content_type.startswith("image/"):
+        if img.content_type is None or not img.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File is not an image.")
 
     # process the images using Gemini and extract menu data

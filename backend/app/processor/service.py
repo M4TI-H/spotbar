@@ -19,23 +19,27 @@ async def process_menu_with_gemini(files: List[UploadFile]):
     Nie dodawaj żadnych markdownowych znaczników typu ``` json.
     """
     
-    content_parts = [prompt]
+    content_parts: List[str | types.Part] = [prompt]
     
     for file in files:
         img_bytes = await file.read()
-        content_parts.append(
-            types.Part.from_bytes(data=img_bytes, mime_type=file.content_type)
-        )
-    
-        response = client.models.generate_content(
-            model="models/gemini-2.5-flash",
-            contents=content_parts,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-            )
-        )
+        m_type = file.content_type or "image/png" 
         
+        content_parts.append(
+            types.Part.from_bytes(data=img_bytes, mime_type=m_type)
+        )
     
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=content_parts,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+        )
+    )
+        
+    if response.text is None:
+        return {"error": "Model did not return any content.", "raw": None}
+
     text_data = response.text.strip()
 
     # cleaning response json

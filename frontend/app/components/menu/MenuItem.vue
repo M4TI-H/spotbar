@@ -17,7 +17,7 @@ const formatPrice = (price: number) => {
 </script>
 
 <template>
-  <div class="w-full max-w-[96vw] sm:max-w-md lg:max-w-4xl flex flex-col">
+  <div class="w-full flex flex-col">
     <div class="w-full flex items-center justify-between gap-4">
       <div class="w-full h-8 flex items-start justify-between">
         <div class="flex gap-2 items-end">
