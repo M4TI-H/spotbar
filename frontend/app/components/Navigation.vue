@@ -15,6 +15,7 @@
       Im
     </NuxtLink>
     <NuxtLink
+      to="/menu"
       class="w-min text-sm text-gray-400 p-2 flex items-center justify-center rounded-sm hover:bg-gray-400/30 hover:text-gray-600 cursor-pointer"
     >
       Me

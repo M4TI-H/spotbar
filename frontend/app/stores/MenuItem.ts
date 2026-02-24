@@ -16,9 +16,5 @@ export const useMenuItemStore = defineStore("menuItem", {
       this.isOpened = false;
       this.data = null;
     },
-    save(passedData: MenuItem) {
-      this.data = passedData;
-      this.close();
-    },
   },
 });

@@ -2,14 +2,38 @@
 import type MenuItem from "~/models/MenuItem";
 
 const menuItemStore = useMenuItemStore();
+const menuStore = useMenuStore();
 
 const isSimpleField = (value: any) => typeof value !== "object";
 
 const localData = ref<MenuItem | null>(null);
 
-const saveChanges = () => {
-  if (localData.value) {
-    menuItemStore.save(localData.value);
+const saveChanges = async () => {
+  if (!localData.value) return;
+
+  try {
+    // data has been saved
+    const success = await menuStore.save(localData.value);
+
+    if (success) {
+      // check if correct data has been saved (the same values)
+      const savedItem = menuStore.menu.find(
+        (i) => i.id === localData.value?.id,
+      );
+
+      const isCorrect =
+        JSON.stringify(savedItem) === JSON.stringify(localData.value);
+
+      if (isCorrect) {
+        menuItemStore.close();
+      }
+    } else {
+      console.log("Failed to save changes. Try again.");
+    }
+  } catch (err: any) {
+    console.log("Server has failed.");
+  } finally {
+    //loading spinner
   }
 };
 

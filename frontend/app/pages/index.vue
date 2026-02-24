@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 const cities = ref([
   { name: "Gdańsk", code: "GD" },
   { name: "Warszawa", code: "WAW" },

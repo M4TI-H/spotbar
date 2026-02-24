@@ -9,11 +9,19 @@ export const useMenuStore = defineStore("menu", {
     addToMenu(newItems: MenuItem[]) {
       this.menu = [...this.menu, ...newItems];
     },
-    save(updatedItem: MenuItem) {
-      const index = this.menu.findIndex((item) => item.id === updatedItem.id);
+    async save(updatedItem: MenuItem) {
+      try {
+        const index = this.menu.findIndex((item) => item.id === updatedItem.id);
 
-      if (index !== -1) {
-        this.menu[index] = { ...updatedItem };
+        if (index !== -1) {
+          this.menu[index] = { ...updatedItem };
+          return true;
+        }
+
+        return false;
+      } catch (err: any) {
+        console.error(err);
+        return false;
       }
     },
     removeItem(id: string) {
