@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type MenuItem from "~/models/MenuItem";
+import EditableField from "./EditableField.vue";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
@@ -70,22 +71,13 @@ watch(
       <div class="p-4 overflow-y-auto max-h-[80vh]">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <template v-for="(value, key) in localData" :key="key">
-            <div
+            <EditableField
               v-if="
                 isSimpleField(value) && key !== 'description' && key !== 'id'
               "
-              class="flex flex-col gap-1"
-            >
-              <label
-                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
-                >{{ key }}</label
-              >
-              <input
-                v-model="localData[key]"
-                class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 transition-all text-sm text-gray-700"
-                type="text"
-              />
-            </div>
+              v-model="localData[key] as string | number"
+              :label="String(key)"
+            />
           </template>
 
           <div class="md:col-span-3 flex flex-col gap-1">

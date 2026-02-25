@@ -6,4 +6,10 @@ export default interface MenuItem {
   ingredients?: string[];
   description?: string;
   section?: string;
+  metadata: MenuItemMetadata | null;
+}
+
+export interface MenuItemMetadata {
+  hidden_attrs?: string[];
+  [key: string]: any;
 }
