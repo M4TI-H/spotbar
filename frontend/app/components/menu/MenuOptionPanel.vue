@@ -32,6 +32,8 @@ const uploadPhotos = async (files: File[]) => {
     console.error(error);
   }
 };
+
+const { defaultCurrency } = storeToRefs(menuStore);
 </script>
 <template>
   <div class="px-4 py-3 gap-4 flex flex-col rounded-md border border-gray-300">
@@ -47,17 +49,16 @@ const uploadPhotos = async (files: File[]) => {
         placeholder="Menu description"
         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-20 text-sm resize-none"
       ></textarea>
-      <div class="w-full flex items-center gap-4">
+      <div class="w-full flex items-center justify-between pl-1">
+        <p class="text-sm text-gray-500">Default currency:</p>
         <select
-          class="px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm"
+          v-model="defaultCurrency"
+          class="pl-1 pr-5 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm"
         >
-          <option class="text-gray-500" selected disabled>
-            Select default currency
-          </option>
-          <option>PLN (zł)</option>
-          <option>GBP (£)</option>
-          <option>EUR (€)</option>
-          <option>USD ($)</option>
+          <option value="PLN" selected>PLN (zł)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="USD">USD ($)</option>
         </select>
       </div>
     </div>

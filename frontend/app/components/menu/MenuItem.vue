@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useFormat } from "~/composables/utils/useFormat";
 import type MenuItem from "~/models/MenuItem";
 
 defineProps<{
@@ -8,12 +9,7 @@ defineProps<{
 const menuStore = useMenuStore();
 const menuItemStore = useMenuItemStore();
 
-// const formatPrice = (price: number) => {
-//   return new Intl.NumberFormat("pl-PL", {
-//     style: "currency",
-//     currency: menuStore.defaultCurrency,
-//   }).format(price);
-// };
+const { formatPrice } = useFormat();
 </script>
 
 <template>
@@ -27,7 +23,7 @@ const menuItemStore = useMenuItemStore();
         </div>
 
         <h2 v-if="item.price" class="text-gray-700 text-xl">
-          {{ item.price }}
+          {{ formatPrice(item.price) }}
         </h2>
       </div>
       <div class="flex gap-2">

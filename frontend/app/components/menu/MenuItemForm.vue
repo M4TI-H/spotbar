@@ -5,7 +5,10 @@ import EditableField from "./EditableField.vue";
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
 
-const isSimpleField = (value: any) => typeof value !== "object";
+const isSimpleField = (value: any) => {
+  if (value === null) return true;
+  return typeof value === "string" || typeof value === "number";
+};
 
 const localData = ref<MenuItem | null>(null);
 
@@ -66,6 +69,12 @@ watch(
         <h1 class="text-xl font-semibold text-gray-800">
           Modifying {{ localData.name }}
         </h1>
+        <button
+          @click="menuItemStore.close()"
+          class="hover:bg-gray-100 px-1 rounded-md transition-colors cursor-pointer"
+        >
+          <i class="pi pi-times text-gray-400 text-sm"></i>
+        </button>
       </div>
 
       <div class="p-4 overflow-y-auto max-h-[80vh]">
@@ -73,10 +82,15 @@ watch(
           <template v-for="(value, key) in localData" :key="key">
             <EditableField
               v-if="
-                isSimpleField(value) && key !== 'description' && key !== 'id'
+                isSimpleField(value) &&
+                key !== 'description' &&
+                key !== 'id' &&
+                key !== 'ingredients' &&
+                key !== 'metadata'
               "
-              v-model="localData[key] as string | number"
               :label="String(key)"
+              :suffix="key === 'price' ? menuStore.defaultCurrency : undefined"
+              v-model="localData[key]"
             />
           </template>
 
@@ -129,7 +143,7 @@ watch(
       >
         <button
           @click="menuItemStore.close()"
-          class="px-6 py-2 text-sm font-semibold text-gray-500 hover:text-gray-700 cursor-pointer"
+          class="hover:bg-gray-100 text-gray-400 px-3 rounded-md transition-colors cursor-pointer"
         >
           Cancel
         </button>

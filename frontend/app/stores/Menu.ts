@@ -4,7 +4,7 @@ import type MenuItem from "~/models/MenuItem";
 export const useMenuStore = defineStore("menu", {
   state: () => ({
     menu: [] as MenuItem[],
-    defaultCurrency: "" as string,
+    defaultCurrency: "PLN" as string,
   }),
   actions: {
     addToMenu(newItems: MenuItem[]) {
