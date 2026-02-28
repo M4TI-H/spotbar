@@ -130,7 +130,6 @@ const loadSampleMenu = async () => {
 </script>
 <template>
   <div class="px-4 py-3 gap-4 flex flex-col rounded-md border border-gray-300">
-    <h1 class="text-lg text-gray-900 font-semibold">New menu</h1>
     <div class="min-w-sm flex flex-col gap-2">
       <h2 class="text-lg text-gray-600 font-semibold">Menu options</h2>
       <input

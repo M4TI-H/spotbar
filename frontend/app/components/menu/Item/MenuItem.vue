@@ -3,7 +3,7 @@ import { useFormat } from "~/composables/utils/useFormat";
 import type MenuItem from "~/models/MenuItem";
 
 defineProps<{
-  item: MenuItem;
+  item?: MenuItem;
 }>();
 
 const menuStore = useMenuStore();
@@ -13,7 +13,7 @@ const { formatPrice } = useFormat();
 </script>
 
 <template>
-  <div class="w-full flex flex-col">
+  <div v-if="item" class="w-full flex flex-col">
     <div class="w-full flex items-center justify-between gap-4">
       <div class="w-full h-8 flex items-start justify-between">
         <div class="flex gap-2 items-end">
@@ -29,17 +29,15 @@ const { formatPrice } = useFormat();
       <div class="flex gap-2">
         <button
           @click="menuItemStore.openToEdit(item)"
-          class="text-sm text-amber-500 py-2 px-3 bg-amber-100 border border-amber-300 hover:bg-amber-200 rounded-md cursor-pointer flex items-center gap-2"
+          class="text-sm text-amber-500 p-2 bg-amber-100 border border-amber-300 hover:bg-amber-200 rounded-md cursor-pointer flex items-center gap-2 transition-colors"
         >
           <i class="pi pi-pencil text-sm"></i>
-          Edit
         </button>
         <button
           @click="menuStore.removeItem(item.id)"
-          class="text-sm text-red-500 py-2 px-3 bg-red-100 border border-red-300 hover:bg-red-200 rounded-md cursor-pointer flex items-center gap-2"
+          class="text-sm text-red-500 p-2 bg-red-100 border border-red-300 hover:bg-red-200 rounded-md cursor-pointer flex items-center gap-2 transition-colors"
         >
           <i class="pi pi-trash text-sm"></i>
-          Delete
         </button>
       </div>
     </div>

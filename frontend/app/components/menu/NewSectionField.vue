@@ -4,13 +4,15 @@ import type Section from "~/models/Section";
 const menuStore = useMenuStore();
 
 const isEdited = ref<boolean>(false);
-const newSection = ref<Partial<Section> | null>(null);
+const newSection = ref<Section | null>(null);
 
 const startEditing = () => {
   newSection.value = {
     id: "",
     name: "",
+    menu_id: "c0abaea2-5328-4ffd-9301-3697e45e3ced", //set menu onMounted
     description: "",
+    position: 999,
   };
   isEdited.value = true;
 };
@@ -45,7 +47,7 @@ const handleSubmit = () => {
           v-model="newSection.name"
           type="text"
           placeholder="Section name"
-          class="w-md px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-lg font-semibold placeholder:font-normal"
+          class="w-md px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all font-semibold placeholder:font-normal"
         />
         <div class="w-full h-px bg-gray-300"></div>
       </div>

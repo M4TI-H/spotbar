@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type MenuItem from "~/models/MenuItem";
-import EditableField from "./EditableField.vue";
+import EditableField from "../EditableFields/EditableField.vue";
+import SelectSection from "./SelectSection.vue";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
@@ -28,6 +29,7 @@ const saveChanges = async () => {
       const isCorrect =
         JSON.stringify(savedItem) === JSON.stringify(localData.value);
 
+      console.log(localData.value);
       if (isCorrect) {
         menuItemStore.close();
       }
@@ -68,9 +70,7 @@ watch(
       v-if="localData"
       class="w-full max-w-4xl bg-white border border-gray-400 rounded-md shadow-2xl flex flex-col"
     >
-      <div
-        class="flex items-center justify-between px-4 py-4 border-b border-gray-200"
-      >
+      <div class="flex items-center justify-between p-4">
         <h1 class="text-xl font-semibold text-gray-800">
           Modifying {{ localData.name }}
         </h1>
@@ -84,11 +84,13 @@ watch(
 
       <div class="p-4 overflow-y-auto max-h-[80vh]">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <SelectSection v-model="localData.section_id" />
           <template v-for="(value, key) in localData" :key="key">
             <EditableField
               v-if="
                 isSimpleField(value) &&
                 key !== 'id' &&
+                key !== 'section_id' &&
                 key !== 'description' &&
                 key !== 'ingredients' &&
                 key !== 'metadata'

@@ -4,9 +4,10 @@ import type Section from "~/models/Section";
 
 export const useMenuStore = defineStore("menu", {
   state: () => ({
+    menu: {} as any,
     menuItems: [] as MenuItem[],
     defaultCurrency: "PLN" as string,
-    sections: [] as Partial<Section>[],
+    sections: [] as Section[],
   }),
   actions: {
     addToMenu(newItems: MenuItem[]) {
@@ -16,7 +17,19 @@ export const useMenuStore = defineStore("menu", {
       this.sections = sections;
     },
     addSection(newSection: Section) {
-      this.sections.push(newSection);
+      const targetPos = newSection.position;
+
+      this.sections.forEach((s) => {
+        if (s.position >= targetPos) {
+          s.position += 1;
+        }
+      });
+
+      newSection.id = crypto.randomUUID();
+      newSection.menu_id = "c0abaea2-5328-4ffd-9301-3697e45e3ced";
+
+      this.sections.push({ ...newSection });
+      this.sections.sort((a, b) => a.position - b.position);
     },
     removeSection() {},
     async save(updatedItem: MenuItem) {
@@ -32,7 +45,7 @@ export const useMenuStore = defineStore("menu", {
           this.menuItems.push({ ...updatedItem });
         }
 
-        return false;
+        return true;
       } catch (err: any) {
         console.error(err);
         return false;

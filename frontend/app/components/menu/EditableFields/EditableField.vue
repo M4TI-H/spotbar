@@ -1,9 +1,4 @@
 <script setup lang="ts">
-import { useFormat } from "~/composables/utils/useFormat";
-
-const menuStore = useMenuStore();
-const { getCurrencySymbol } = useFormat();
-
 const model = defineModel<string | number>();
 
 defineProps<{
