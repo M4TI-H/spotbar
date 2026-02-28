@@ -23,12 +23,12 @@ const { formatPrice } = useFormat();
         </div>
 
         <h2 v-if="item.price" class="text-gray-700 text-xl">
-          {{ formatPrice(item.price) }}
+          {{ formatPrice(item.price.toFixed(2)) }}
         </h2>
       </div>
       <div class="flex gap-2">
         <button
-          @click="menuItemStore.open(item)"
+          @click="menuItemStore.openToEdit(item)"
           class="text-sm text-amber-500 py-2 px-3 bg-amber-100 border border-amber-300 hover:bg-amber-200 rounded-md cursor-pointer flex items-center gap-2"
         >
           <i class="pi pi-pencil text-sm"></i>

@@ -40,7 +40,7 @@ const uploadPhotos = async (files: File[]) => {
   <div class="w-full flex gap-4 px-4">
     <FileSelect @upload="uploadPhotos" />
 
-    <Menu v-if="menuStore.menu.length > 0" />
+    <Menu v-if="menuStore.menuItems.length > 0" />
     <ProcessingLoading v-if="isProcessing" />
   </div>
 </template>

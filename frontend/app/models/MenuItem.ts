@@ -1,11 +1,11 @@
 export default interface MenuItem {
   id: string;
+  section_id?: string;
   category: string;
   name: string;
-  price?: number;
+  price: number;
   ingredients?: string[];
   description?: string;
-  section?: string;
   metadata: MenuItemMetadata | null;
 }
 

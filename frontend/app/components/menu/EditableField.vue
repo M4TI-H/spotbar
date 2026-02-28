@@ -6,8 +6,9 @@ const { getCurrencySymbol } = useFormat();
 
 const model = defineModel<string | number>();
 
-const props = defineProps<{
+defineProps<{
   label: string;
+  type: string;
   isHideable?: boolean;
   suffix?: string;
 }>();
@@ -65,27 +66,11 @@ const toggleOptions = (event: any) => {
         </div>
       </Popover>
     </div>
-    <div class="relative w-full">
-      <input
-        v-model="model"
-        :class="{ 'pr-12': suffix }"
-        class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 transition-all text-sm text-gray-700"
-        type="text"
-      />
-      <div
-        v-if="suffix"
-        class="absolute inset-y-0 right-0 px-3 flex items-center pointer-events-none bg-gray-200 rounded-r-md border border-gray-300"
-      >
-        <p
-          class="text-sm font-semibold text-gray-400 lowercase tracking-tighter"
-        >
-          {{
-            suffix === menuStore.defaultCurrency
-              ? getCurrencySymbol(suffix)
-              : suffix
-          }}
-        </p>
-      </div>
-    </div>
+    <MenuEditableFieldsText v-if="type === 'text'" v-model="model" />
+    <MenuEditableFieldsNumber
+      v-if="type === 'number'"
+      v-model="model"
+      :suffix="suffix"
+    />
   </div>
 </template>

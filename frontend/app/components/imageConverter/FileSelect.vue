@@ -68,11 +68,6 @@ const handleUploadPreview = async (event: Event) => {
 const handleEmitUpload = () => {
   const unprocessedPreviews = previews.value.filter((p) => !p.wasProcessed);
 
-  console.log(
-    "Files to be sent:",
-    unprocessedPreviews.map((p) => p.file.name),
-  );
-
   if (unprocessedPreviews.length > 0) {
     const filesToUpload = unprocessedPreviews.map((p) => p.file);
     emit("upload", filesToUpload);

@@ -16,12 +16,12 @@ const saveChanges = async () => {
   if (!localData.value) return;
 
   try {
-    // data has been saved
+    //data has been saved
     const success = await menuStore.save(localData.value);
 
     if (success) {
-      // check if correct data has been saved (the same values)
-      const savedItem = menuStore.menu.find(
+      //check if correct data has been saved (the same values)
+      const savedItem = menuStore.menuItems.find(
         (i) => i.id === localData.value?.id,
       );
 
@@ -39,6 +39,11 @@ const saveChanges = async () => {
   } finally {
     //loading spinner
   }
+};
+
+const getFieldType = (value: any) => {
+  if (typeof value === "number") return "number";
+  return "text";
 };
 
 //initial values copy
@@ -83,12 +88,13 @@ watch(
             <EditableField
               v-if="
                 isSimpleField(value) &&
-                key !== 'description' &&
                 key !== 'id' &&
+                key !== 'description' &&
                 key !== 'ingredients' &&
                 key !== 'metadata'
               "
               :label="String(key)"
+              :type="getFieldType(value)"
               :suffix="key === 'price' ? menuStore.defaultCurrency : undefined"
               v-model="localData[key]"
             />

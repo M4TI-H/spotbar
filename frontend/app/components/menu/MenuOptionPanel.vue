@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type MenuItem from "~/models/MenuItem";
 import FileSelect from "../imageConverter/FileSelect.vue";
+import type Section from "~/models/Section";
 
 const menuStore = useMenuStore();
 const isProcessing = ref<boolean>(false);
@@ -34,6 +35,98 @@ const uploadPhotos = async (files: File[]) => {
 };
 
 const { defaultCurrency } = storeToRefs(menuStore);
+
+const loadSampleMenu = async () => {
+  isProcessing.value = true;
+
+  const menuId = crypto.randomUUID();
+  const sectionId1 = crypto.randomUUID();
+  const sectionId2 = crypto.randomUUID();
+
+  const sampleSections: Section[] = [
+    {
+      id: sectionId1,
+      menu_id: menuId,
+      name: "Luxury & Vintage Cocktails",
+      description:
+        "Exclusive spirits and rare ingredients from around the world.",
+      position: 1,
+    },
+    {
+      id: sectionId2,
+      menu_id: menuId,
+      name: "Reinvented Classics",
+      description: "Your favorite classics with a modern, local twist.",
+      position: 2,
+    },
+  ];
+
+  const sampleItems: MenuItem[] = [
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId1,
+      category: "Cocktails",
+      name: "Legendary Brown Spirits Long Island",
+      price: 99,
+      ingredients: [
+        "Wild Turkey Rare Bread",
+        "Remy Martin VSOP",
+        "Casamigos Reposado",
+        "Cola",
+      ],
+      description:
+        "Extremely strong and sophisticated blend of premium spirits.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId1,
+      category: "Cocktails",
+      name: "Ultimate Negroni",
+      price: 69,
+      ingredients: [
+        "Bareksten Botanical Gin",
+        "Campari Cask Tale",
+        "9Didante Vermouth",
+      ],
+      description: "Aged in oak barrels for extra smoothness.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId2,
+      category: "Cocktails",
+      name: "Gdańsk & Stormy",
+      price: 43,
+      ingredients: [
+        "Angostura 5yo Rum",
+        "Goldwasser",
+        "Ginger Beer",
+        "Citrus",
+        "Smoke",
+      ],
+      description:
+        "A tribute to the local history with a touch of gold flakes.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId2,
+      category: "Cocktails",
+      name: "Basil Gimlet",
+      price: 42,
+      ingredients: ["Citadelle Gin", "Basil", "Lime", "Lime leaves"],
+      description: "Fresh, herbal and perfectly balanced sour.",
+      metadata: { hidden_attrs: [] },
+    },
+  ];
+
+  menuStore.setSections(sampleSections);
+  menuStore.addToMenu(sampleItems);
+
+  isProcessing.value = false;
+  console.log("Sample data with UUIDs loaded successfully.");
+};
 </script>
 <template>
   <div class="px-4 py-3 gap-4 flex flex-col rounded-md border border-gray-300">
@@ -62,6 +155,6 @@ const { defaultCurrency } = storeToRefs(menuStore);
         </select>
       </div>
     </div>
-    <FileSelect @upload="uploadPhotos" />
+    <FileSelect @upload="loadSampleMenu" />
   </div>
 </template>

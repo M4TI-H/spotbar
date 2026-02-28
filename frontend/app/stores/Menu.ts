@@ -1,22 +1,35 @@
 import { defineStore } from "pinia";
 import type MenuItem from "~/models/MenuItem";
+import type Section from "~/models/Section";
 
 export const useMenuStore = defineStore("menu", {
   state: () => ({
-    menu: [] as MenuItem[],
+    menuItems: [] as MenuItem[],
     defaultCurrency: "PLN" as string,
+    sections: [] as Partial<Section>[],
   }),
   actions: {
     addToMenu(newItems: MenuItem[]) {
-      this.menu = [...this.menu, ...newItems];
+      this.menuItems = [...this.menuItems, ...newItems];
     },
+    setSections(sections: Section[]) {
+      this.sections = sections;
+    },
+    addSection(newSection: Section) {
+      this.sections.push(newSection);
+    },
+    removeSection() {},
     async save(updatedItem: MenuItem) {
       try {
-        const index = this.menu.findIndex((item) => item.id === updatedItem.id);
+        const index = this.menuItems.findIndex(
+          (item) => item.id === updatedItem.id,
+        );
 
         if (index !== -1) {
-          this.menu[index] = { ...updatedItem };
-          return true;
+          this.menuItems[index] = { ...updatedItem };
+        } else {
+          // create new item if it does not exist
+          this.menuItems.push({ ...updatedItem });
         }
 
         return false;
@@ -26,7 +39,7 @@ export const useMenuStore = defineStore("menu", {
       }
     },
     removeItem(id: string) {
-      this.menu = this.menu.filter((item) => item.id !== id);
+      this.menuItems = this.menuItems.filter((item) => item.id !== id);
     },
   },
 });
