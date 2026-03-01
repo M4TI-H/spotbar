@@ -3,7 +3,11 @@ import type Section from "~/models/Section";
 
 const menuStore = useMenuStore();
 const modalStore = useModalStore();
-const newSection = ref<Section | null>(null);
+const localData = ref<Section | null>(null);
+
+const props = defineProps<{
+  data?: any;
+}>();
 
 const positionOptions = computed(() => {
   const options = [{ label: "At the top", value: 1 }];
@@ -15,30 +19,43 @@ const positionOptions = computed(() => {
     });
   });
 
-  return options;
+  if (!props.data) return options;
+
+  return options.filter((opt) => {
+    return opt.value !== props.data.position + 1;
+  });
 });
 
 const handleSubmit = () => {
-  if (!newSection.value || !newSection.value.name?.trim()) return;
-  menuStore.addSection(newSection.value);
-
-  newSection.value = null;
-  modalStore.close();
-  console.log(menuStore.sections);
+  if (!localData.value || !localData.value.name?.trim()) return;
+  try {
+    menuStore.saveSection(localData.value);
+    localData.value = null;
+    modalStore.close();
+    console.log(menuStore.sections);
+  } catch (err: any) {
+    console.log(err);
+  } finally {
+    //loading spinner
+  }
 };
 
 onMounted(() => {
-  newSection.value = {
-    id: "",
-    name: "",
-    menu_id: "c0abaea2-5328-4ffd-9301-3697e45e3ced", //set menu onMounted
-    description: "",
-    position: 999,
-  };
+  if (props.data) {
+    localData.value = { ...props.data };
+  } else {
+    localData.value = {
+      id: "",
+      name: "",
+      menu_id: "c0abaea2-5328-4ffd-9301-3697e45e3ced",
+      description: "",
+      position: menuStore.sections.length + 1,
+    };
+  }
 });
 </script>
 <template>
-  <div v-if="newSection" class="flex flex-col gap-4">
+  <div v-if="localData" class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
       <h1 class="text-xl font-semibold text-gray-800">
         Add section to the menu
@@ -52,13 +69,13 @@ onMounted(() => {
     </div>
     <div class="flex flex-col gap-2">
       <input
-        v-model="newSection.name"
+        v-model="localData.name"
         type="text"
         placeholder="Section name"
         class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm font-semibold placeholder:font-normal"
       />
       <textarea
-        v-model="newSection.description"
+        v-model="localData.description"
         placeholder="Section description"
         class="w-full px-3 py-2 border text-gray-500 border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-16 text-sm resize-none"
       ></textarea>
@@ -66,7 +83,7 @@ onMounted(() => {
     <div class="w-full flex items-center justify-between pl-2">
       <p class="text-sm text-gray-500">Select position:</p>
       <select
-        v-model="newSection.position"
+        v-model="localData.position"
         class="pl-2 pr-4 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm"
       >
         <option

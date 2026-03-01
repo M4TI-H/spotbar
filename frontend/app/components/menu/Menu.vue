@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NewSectionField from "./NewSectionField.vue";
-import NewProductField from "./NewProductField.vue";
 import AddSectionBtn from "./Sections/AddSectionBtn.vue";
+import Section from "./Sections/Section.vue";
 
 const menuStore = useMenuStore();
 
@@ -50,7 +50,7 @@ const groupedMenu = computed(() => {
 <template>
   <div
     v-if="menuStore.menuItems"
-    class="w-full h-min flex flex-col px-4 pt-3 pb-5 gap-4 border border-gray-300 rounded-md"
+    class="w-full h-min flex flex-col px-2 pt-3 pb-5 gap-4 border border-gray-300 rounded-md"
   >
     <div class="w-full flex items-center overflow-x-auto pb-2">
       <AddSectionBtn />
@@ -58,7 +58,7 @@ const groupedMenu = computed(() => {
         @click="activeSection = 'all'"
         class="relative px-4 pb-1 text-gray-600 whitespace-nowrap cursor-pointer"
       >
-        All items
+        All
         <span
           v-if="activeSection === 'all'"
           class="absolute bottom-0 left-0 w-full h-px bg-gray-600"
@@ -82,21 +82,9 @@ const groupedMenu = computed(() => {
       <div
         v-for="section in groupedMenu"
         :key="section.id"
-        class="flex flex-col"
+        class="flex flex-col gap-2"
       >
-        <div class="flex items-center gap-4">
-          <h3
-            class="text-xl font-bold text-gray-700 uppercase tracking-wider whitespace-nowrap"
-          >
-            {{ section.name }}
-          </h3>
-          <div class="w-full h-px bg-gray-300"></div>
-        </div>
-        <p class="text-sm text-gray-400 px-1">{{ section.description }}</p>
-        <div class="grid grid-cols-1 gap-4 mt-2">
-          <MenuItem v-for="item in section.items" :key="item.id" :item="item" />
-        </div>
-        <NewProductField />
+        <Section :section="section" />
       </div>
     </div>
     <NewSectionField />

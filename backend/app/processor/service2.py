@@ -6,7 +6,7 @@ async def process_sample_menu():
         "name": "Legendary Brown Spirits Long Island Iced Tea",
         "price": 99,
         "section": "Luxury & Vintage Cocktails",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Wild Turkey Rare Bread", "Bruichladdich Classic Laddie", "Mount Gay XO Rum", "Remy Martin VSOP", "Casamigos Reposado", "Cola"],
         "description": "Strong"
     },
@@ -15,7 +15,7 @@ async def process_sample_menu():
         "name": "Ultimate Negroni",
         "price": 69,
         "section": "Luxury & Vintage Cocktails",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Bareksten Botanical Gin", "Campari Cask Tale", "9Didante Vermouth"],
         "description": "Dry"
     },
@@ -24,7 +24,7 @@ async def process_sample_menu():
         "name": "Final Penicillin Highball",
         "price": 89,
         "section": "Luxury & Vintage Cocktails",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Lagavulin 16yo", "Laphroaig Whisky", "Honey", "Ginger"],
         "description": "Peaty, refreshing"
     },
@@ -33,7 +33,7 @@ async def process_sample_menu():
         "name": "Gdańsk & Stormy",
         "price": 43,
         "section": "Reinvented Classics",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Angostura 5yo Rum", "Goldwasser", "Ginger Beer", "Citrus", "Smoke"],
         "description": "Refreshing"
     },
@@ -42,7 +42,7 @@ async def process_sample_menu():
         "name": "Winston Old Fashioned",
         "price": 42,
         "section": "Reinvented Classics",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Singleton 12yo", "Calvados", "Baked Apple"],
         "description": "Dry, strong"
     },
@@ -51,7 +51,7 @@ async def process_sample_menu():
         "name": "Basil Gimlet",
         "price": 42,
         "section": "Reinvented Classics",
-        "category": "Cocktails",
+        "category_id": "cat_01",
         "ingredients": ["Citadelle Gin", "Basil", "Lime", "Lime leaves"],
         "description": "Sour"
     }

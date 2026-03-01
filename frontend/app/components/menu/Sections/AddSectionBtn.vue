@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import AddSection from "~/components/modals/AddSection.vue";
+import SectionForm from "~/components/modals/SectionForm.vue";
 
 const modalStore = useModalStore();
 
 const handleAddSectionClick = () => {
-  modalStore.open(AddSection, {
+  modalStore.open(SectionForm, {
     menuId: "c0abaea2-5328-4ffd-9301-3697e45e3ced",
     currentPosition: 5,
   });

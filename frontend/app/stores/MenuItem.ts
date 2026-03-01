@@ -29,7 +29,7 @@ export const useMenuItemStore = defineStore("menuItem", {
       this.data = {
         id: crypto.randomUUID(),
         section_id: sectionId || "",
-        category: "",
+        category_id: "",
         name: "",
         price: 0,
         ingredients: [],

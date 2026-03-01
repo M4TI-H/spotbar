@@ -2,6 +2,7 @@
 import type MenuItem from "~/models/MenuItem";
 import EditableField from "../EditableFields/EditableField.vue";
 import SelectSection from "./SelectSection.vue";
+import SelectCategory from "./SelectCategory.vue";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
@@ -11,6 +12,7 @@ const isSimpleField = (value: any) => {
   return typeof value === "string" || typeof value === "number";
 };
 
+const initialName = ref<string>("");
 const localData = ref<MenuItem | null>(null);
 
 const saveChanges = async () => {
@@ -60,6 +62,12 @@ watch(
   },
   { immediate: true },
 );
+
+onMounted(() => {
+  if (localData.value && localData.value.name !== "") {
+    initialName.value = localData.value.name;
+  }
+});
 </script>
 
 <template>
@@ -68,11 +76,11 @@ watch(
   >
     <div
       v-if="localData"
-      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md shadow-2xl flex flex-col"
+      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md flex flex-col"
     >
       <div class="flex items-center justify-between p-4">
         <h1 class="text-xl font-semibold text-gray-800">
-          Modifying {{ localData.name }}
+          {{ initialName ? `Modifying ${initialName}` : "New menu item" }}
         </h1>
         <button
           @click="menuItemStore.close()"
@@ -83,14 +91,19 @@ watch(
       </div>
 
       <div class="p-4 overflow-y-auto max-h-[80vh]">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SelectSection v-model="localData.section_id" />
+          <SelectCategory v-model="localData.category_id" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
           <template v-for="(value, key) in localData" :key="key">
             <EditableField
               v-if="
                 isSimpleField(value) &&
                 key !== 'id' &&
                 key !== 'section_id' &&
+                key !== 'category_id' &&
                 key !== 'description' &&
                 key !== 'ingredients' &&
                 key !== 'metadata'
@@ -109,7 +122,7 @@ watch(
             >
             <textarea
               v-model="localData.description"
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 transition-all h-20 text-sm resize-none"
+              class="w-full px-3 py-2 b border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-20 text-sm resize-none"
               placeholder="Describe this item..."
             ></textarea>
           </div>
@@ -132,7 +145,7 @@ watch(
                     .split(',')
                     .map((s) => s.trim()))
               "
-              class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md focus:border-emerald-500 focus:bg-white outline-0 h-16 text-sm resize-none"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 h-16 text-sm resize-none"
             ></textarea>
           </div>
 
@@ -146,9 +159,7 @@ watch(
         </div>
       </div>
 
-      <div
-        class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3"
-      >
+      <div class="px-6 py-2 border-t border-gray-200 flex justify-end gap-3">
         <button
           @click="menuItemStore.close()"
           class="hover:bg-gray-100 text-gray-400 px-3 rounded-md transition-colors cursor-pointer"

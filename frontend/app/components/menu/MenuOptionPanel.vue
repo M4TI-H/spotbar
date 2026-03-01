@@ -65,7 +65,7 @@ const loadSampleMenu = async () => {
     {
       id: crypto.randomUUID(),
       section_id: sectionId1,
-      category: "Cocktails",
+      category_id: "cat_01",
       name: "Legendary Brown Spirits Long Island",
       price: 99,
       ingredients: [
@@ -81,7 +81,7 @@ const loadSampleMenu = async () => {
     {
       id: crypto.randomUUID(),
       section_id: sectionId1,
-      category: "Cocktails",
+      category_id: "cat_01",
       name: "Ultimate Negroni",
       price: 69,
       ingredients: [
@@ -95,7 +95,7 @@ const loadSampleMenu = async () => {
     {
       id: crypto.randomUUID(),
       section_id: sectionId2,
-      category: "Cocktails",
+      category_id: "cat_01",
       name: "Gdańsk & Stormy",
       price: 43,
       ingredients: [
@@ -112,7 +112,7 @@ const loadSampleMenu = async () => {
     {
       id: crypto.randomUUID(),
       section_id: sectionId2,
-      category: "Cocktails",
+      category_id: "cat_01",
       name: "Basil Gimlet",
       price: 42,
       ingredients: ["Citadelle Gin", "Basil", "Lime", "Lime leaves"],
