@@ -22,8 +22,15 @@ const { formatPrice } = useFormat();
           </h1>
         </div>
 
-        <h2 v-if="item.price" class="text-gray-700 text-xl">
-          {{ formatPrice(item.price.toFixed(2)) }}
+        <h2
+          v-if="item.price !== null && item.price !== undefined"
+          class="text-gray-700 text-xl"
+        >
+          {{
+            Number(item.price) > 0
+              ? formatPrice(item.price.toFixed(2))
+              : "Complimentary item"
+          }}
         </h2>
       </div>
       <div class="flex gap-2">

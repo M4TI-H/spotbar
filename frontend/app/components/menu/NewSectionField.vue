@@ -20,7 +20,7 @@ const startEditing = () => {
 const handleSubmit = () => {
   if (!newSection.value || !newSection.value.name?.trim()) return;
 
-  menuStore.addSection(newSection.value);
+  menuStore.saveSection(newSection.value);
 
   isEdited.value = false;
   newSection.value = null;

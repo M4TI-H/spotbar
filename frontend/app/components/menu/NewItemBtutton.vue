@@ -1,9 +1,13 @@
 <script setup lang="ts">
 const menuItemStore = useMenuItemStore();
+
+defineProps<{
+  section_id?: string;
+}>();
 </script>
 <template>
   <button
-    @click="menuItemStore.openEmpty()"
+    @click="menuItemStore.openEmpty(section_id)"
     class="w-fit p-1 font-semibold text-sm text-gray-400 flex items-center gap-2 cursor-pointer rounded-md hover:bg-gray-100 transition-colors whitespace-nowrap"
   >
     <span>+</span>Add new item

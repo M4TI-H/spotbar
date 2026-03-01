@@ -2,7 +2,7 @@
 import SectionForm from "~/components/modals/SectionForm.vue";
 import type MenuItem from "~/models/MenuItem";
 import type Section from "~/models/Section";
-import NewItemField from "../NewItemField.vue";
+import NewItemBtutton from "../NewItemBtutton.vue";
 
 const modalStore = useModalStore();
 
@@ -34,7 +34,7 @@ const handleOpenSectionForm = () => {
       ></span>
     </button>
     <div class="w-full h-px bg-gray-300"></div>
-    <NewItemField />
+    <NewItemBtutton :section_id="section.id" />
   </div>
   <p class="text-sm text-gray-400 px-3">{{ section.description }}</p>
   <div class="grid grid-cols-1 gap-4 mt-2 px-2">

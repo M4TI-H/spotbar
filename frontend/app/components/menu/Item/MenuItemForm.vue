@@ -55,13 +55,24 @@ watch(
   () => menuItemStore.data,
   (newData) => {
     if (newData) {
-      localData.value = JSON.parse(JSON.stringify(newData));
+      const copy = JSON.parse(JSON.stringify(newData));
+
+      if (typeof copy.price === "number") {
+        copy.price = Math.round(copy.price * 100) / 100;
+      }
+
+      localData.value = copy;
     } else {
       localData.value = null;
     }
   },
   { immediate: true },
 );
+
+const activeSectionName = computed(() => {
+  return menuStore.sections.find((s) => s.id === localData.value?.section_id)
+    ?.name;
+});
 
 onMounted(() => {
   if (localData.value && localData.value.name !== "") {
@@ -111,6 +122,7 @@ onMounted(() => {
               :label="String(key)"
               :type="getFieldType(value)"
               :suffix="key === 'price' ? menuStore.defaultCurrency : undefined"
+              :section="activeSectionName"
               v-model="localData[key]"
             />
           </template>

@@ -40,6 +40,20 @@ const handleSubmit = () => {
   }
 };
 
+const handleDelete = () => {
+  if (!localData.value) return;
+  try {
+    menuStore.removeSection(localData.value.id);
+    localData.value = null;
+    modalStore.close();
+    console.log(menuStore.sections);
+  } catch (err: any) {
+    console.log(err);
+  } finally {
+    //loading spinner
+  }
+};
+
 onMounted(() => {
   if (props.data) {
     localData.value = { ...props.data };
@@ -95,19 +109,31 @@ onMounted(() => {
         </option>
       </select>
     </div>
-    <div class="flex items-center justify-between gap-4 self-end">
+    <div
+      class="w-full flex items-center gap-4"
+      :class="[localData.id ? 'justify-between' : 'justify-end']"
+    >
       <button
-        @click="modalStore.close()"
-        class="hover:bg-gray-100 text-gray-400 text-sm py-2 px-3 rounded-md transition-colors cursor-pointer"
+        v-if="localData.id"
+        @click="handleDelete"
+        class="py-2 px-3 text-sm text-red-500 rounded-md bg-red-100 border border-red-300 hover:bg-red-200 cursor-pointer transition-colors"
       >
-        Cancel
+        Delete
       </button>
-      <button
-        @click="handleSubmit"
-        class="w-full py-2 px-3 text-sm text-emerald-500 rounded-md bg-emerald-100 border border-emerald-300 hover:bg-emerald-200 cursor-pointer transition-colors"
-      >
-        Submit
-      </button>
+      <div class="flex items-center gap-4">
+        <button
+          @click="modalStore.close()"
+          class="hover:bg-gray-100 text-gray-400 text-sm py-2 px-3 rounded-md transition-colors cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          @click="handleSubmit"
+          class="py-2 px-3 text-sm text-emerald-500 rounded-md bg-emerald-100 border border-emerald-300 hover:bg-emerald-200 cursor-pointer transition-colors"
+        >
+          Submit
+        </button>
+      </div>
     </div>
   </div>
 </template>

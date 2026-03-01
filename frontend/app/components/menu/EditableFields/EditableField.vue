@@ -6,6 +6,7 @@ defineProps<{
   type: string;
   isHideable?: boolean;
   suffix?: string;
+  section?: string;
 }>();
 
 const popover = ref();
@@ -41,6 +42,7 @@ const toggleOptions = (event: any) => {
             Hide attribute
           </button>
           <button
+            v-if="section"
             class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
           >
             <i class="pi pi-eye-slash"></i>
@@ -48,7 +50,7 @@ const toggleOptions = (event: any) => {
             <div class="flex flex-col min-w-0">
               <span>Hide attribute in section</span>
               <span class="font-semibold text-emerald-600 truncate">
-                Luxury & Vintage Cocktails
+                {{ section }}
               </span>
             </div>
           </button>
@@ -62,9 +64,9 @@ const toggleOptions = (event: any) => {
       </Popover>
     </div>
     <MenuEditableFieldsText v-if="type === 'text'" v-model="model" />
-    <MenuEditableFieldsNumber
+    <MenuEditableFieldsPrice
       v-if="type === 'number'"
-      v-model="model"
+      v-model.number="model"
       :suffix="suffix"
     />
   </div>
