@@ -3,6 +3,8 @@ import type MenuItem from "~/models/MenuItem";
 import EditableField from "../EditableFields/EditableField.vue";
 import SelectSection from "./SelectSection.vue";
 import SelectCategory from "./SelectCategory.vue";
+import CustomAttributeField from "./CustomAttributeField.vue";
+import type { CustomAttribute } from "~/models/MenuItem";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
@@ -14,6 +16,53 @@ const isSimpleField = (value: any) => {
 
 const initialName = ref<string>("");
 const localData = ref<MenuItem | null>(null);
+
+const getSuffix = (key: string) => {
+  if (key === "price") return menuStore.defaultCurrency;
+
+  const customAttr = localData.value?.metadata?.[key];
+  if (customAttr && customAttr.suffix) {
+    return customAttr.suffix;
+  }
+
+  return undefined;
+};
+
+const addCustomField = (attr: CustomAttribute) => {
+  if (!localData.value) return;
+
+  const key = attr.label.toLowerCase().replace(/\s+/g, "_");
+  const defaultValue = attr.type === "number" ? 0 : "";
+
+  const applyToItem = (item: any) => {
+    if (!item.metadata) item.metadata = {};
+
+    item[key] = defaultValue;
+
+    item.metadata[key] = {
+      type: attr.type,
+      suffix: attr.suffix,
+      label: attr.label,
+      visibility: attr.visibility,
+    };
+  };
+
+  applyToItem(localData.value);
+
+  if (attr.visibility === "section") {
+    const sectionId = localData.value.section_id;
+    menuStore.menuItems
+      .filter(
+        (item) =>
+          item.section_id === sectionId && item.id !== localData.value?.id,
+      )
+      .forEach((item) => applyToItem(item));
+  } else if (attr.visibility === "all") {
+    menuStore.menuItems
+      .filter((item) => item.id !== localData.value?.id)
+      .forEach((item) => applyToItem(item));
+  }
+};
 
 const saveChanges = async () => {
   if (!localData.value) return;
@@ -121,7 +170,7 @@ onMounted(() => {
               "
               :label="String(key)"
               :type="getFieldType(value)"
-              :suffix="key === 'price' ? menuStore.defaultCurrency : undefined"
+              :suffix="getSuffix(String(key))"
               :section="activeSectionName"
               v-model="localData[key]"
             />
@@ -160,18 +209,22 @@ onMounted(() => {
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 h-16 text-sm resize-none"
             ></textarea>
           </div>
-
-          <div class="md:col-span-3 pt-2">
-            <button
-              class="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-200 text-gray-400 hover:border-emerald-300 hover:text-emerald-600 rounded-md transition-all text-xs font-semibold cursor-pointer w-fit"
-            >
-              <span>+</span> ADD CUSTOM ATTRIBUTE (GLASS, METHOD, ETC.)
-            </button>
-          </div>
         </div>
       </div>
+      <div class="w-full flex items-center gap-2">
+        <div class="w-1/30 h-px bg-gray-300"></div>
+        <h2 class="text-gray-500 uppercase whitespace-nowrap">
+          Custom attributes
+        </h2>
+        <div class="w-full h-px bg-gray-300"></div>
+      </div>
+      <div class="p-2">
+        <CustomAttributeField @addAttribute="addCustomField" />
+      </div>
 
-      <div class="px-6 py-2 border-t border-gray-200 flex justify-end gap-3">
+      <div
+        class="px-6 py-2 border-t border-gray-200 flex justify-end gap-3 mt-4"
+      >
         <button
           @click="menuItemStore.close()"
           class="hover:bg-gray-100 text-gray-400 px-3 rounded-md transition-colors cursor-pointer"

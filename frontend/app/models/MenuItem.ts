@@ -13,3 +13,11 @@ export interface MenuItemMetadata {
   hidden_attrs?: string[];
   [key: string]: any;
 }
+
+export interface CustomAttribute {
+  label: string;
+  type: string;
+  suffix: string;
+  value: string | number;
+  visibility: string;
+}

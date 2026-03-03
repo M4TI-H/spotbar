@@ -5,6 +5,7 @@ export const useMenuItemStore = defineStore("menuItem", {
   state: () => ({
     isOpened: false as boolean,
     data: null as MenuItem | null,
+    changesMade: false as boolean,
   }),
   getters: {
     isAttributeHidden:

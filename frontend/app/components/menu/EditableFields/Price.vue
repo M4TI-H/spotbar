@@ -72,7 +72,7 @@ onMounted(() => {
     />
     <div
       v-if="suffix"
-      class="absolute inset-y-0 right-0 px-3 flex items-center pointer-events-none bg-gray-200 rounded-r-md border border-gray-300"
+      class="absolute inset-y-0 right-0 px-2 max-w-12 flex items-center pointer-events-none bg-gray-200 rounded-r-md border border-gray-300"
     >
       <p class="text-sm font-semibold text-gray-400 lowercase tracking-tighter">
         {{

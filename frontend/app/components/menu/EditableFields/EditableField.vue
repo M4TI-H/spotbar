@@ -36,6 +36,28 @@ const toggleOptions = (event: any) => {
           class="flex flex-col w-44 bg-white rounded-md border border-gray-300 shadow-lg"
         >
           <button
+            v-if="section"
+            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+          >
+            <i class="pi pi-eye-slash"></i>
+
+            <div class="flex flex-col min-w-0">
+              <span>Duplicate value in </span>
+              <span class="font-semibold text-emerald-600 truncate">
+                {{ section }}
+              </span>
+            </div>
+          </button>
+          <button
+            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+          >
+            <i class="pi pi-eye-slash"></i>
+
+            <div class="flex flex-col min-w-0">
+              <span>Duplicate value in menu</span>
+            </div>
+          </button>
+          <button
             class="w-full py-2 px-3 rounded-t-md text-left text-xs text-gray-500 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
           >
             <i class="pi pi-eye-slash"></i>
@@ -48,7 +70,7 @@ const toggleOptions = (event: any) => {
             <i class="pi pi-eye-slash"></i>
 
             <div class="flex flex-col min-w-0">
-              <span>Hide attribute in section</span>
+              <span>Hide attribute in</span>
               <span class="font-semibold text-emerald-600 truncate">
                 {{ section }}
               </span>
@@ -66,7 +88,7 @@ const toggleOptions = (event: any) => {
     <MenuEditableFieldsText v-if="type === 'text'" v-model="model" />
     <MenuEditableFieldsPrice
       v-if="type === 'number'"
-      v-model.number="model"
+      v-model="model as any"
       :suffix="suffix"
     />
   </div>
