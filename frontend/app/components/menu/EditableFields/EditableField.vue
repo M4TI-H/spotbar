@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import PopoverOptions from "./PopoverOptions.vue";
+
 const model = defineModel<string | number>();
 
 defineProps<{
@@ -9,12 +11,10 @@ defineProps<{
   section?: string;
 }>();
 
-const popover = ref();
+const popoverRef = ref();
 
 const toggleOptions = (event: any) => {
-  if (!popover.value) return;
-
-  popover.value.toggle(event);
+  popoverRef.value?.toggle(event);
 };
 </script>
 
@@ -31,59 +31,7 @@ const toggleOptions = (event: any) => {
       >
         <i class="pi pi-ellipsis-h text-xs text-gray-400"></i>
       </button>
-      <Popover ref="popover">
-        <div
-          class="flex flex-col w-44 bg-white rounded-md border border-gray-300 shadow-lg"
-        >
-          <button
-            v-if="section"
-            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
-          >
-            <i class="pi pi-eye-slash"></i>
-
-            <div class="flex flex-col min-w-0">
-              <span>Duplicate value in </span>
-              <span class="font-semibold text-emerald-600 truncate">
-                {{ section }}
-              </span>
-            </div>
-          </button>
-          <button
-            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
-          >
-            <i class="pi pi-eye-slash"></i>
-
-            <div class="flex flex-col min-w-0">
-              <span>Duplicate value in menu</span>
-            </div>
-          </button>
-          <button
-            class="w-full py-2 px-3 rounded-t-md text-left text-xs text-gray-500 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
-          >
-            <i class="pi pi-eye-slash"></i>
-            Hide attribute
-          </button>
-          <button
-            v-if="section"
-            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
-          >
-            <i class="pi pi-eye-slash"></i>
-
-            <div class="flex flex-col min-w-0">
-              <span>Hide attribute in</span>
-              <span class="font-semibold text-emerald-600 truncate">
-                {{ section }}
-              </span>
-            </div>
-          </button>
-          <button
-            class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
-          >
-            <i class="pi pi-eye-slash"></i>
-            Hide attribute in menu
-          </button>
-        </div>
-      </Popover>
+      <PopoverOptions ref="popoverRef" :section="section ? section : null" />
     </div>
     <MenuEditableFieldsText v-if="type === 'text'" v-model="model" />
     <MenuEditableFieldsPrice

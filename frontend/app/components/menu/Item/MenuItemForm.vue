@@ -211,6 +211,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
       <div class="w-full flex items-center gap-2">
         <div class="w-1/30 h-px bg-gray-300"></div>
         <h2 class="text-gray-500 uppercase whitespace-nowrap">

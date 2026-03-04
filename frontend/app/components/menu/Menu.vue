@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CascadeSelect } from "primevue";
 import NewSectionField from "./NewSectionField.vue";
 import AddSectionBtn from "./Sections/AddSectionBtn.vue";
 import Section from "./Sections/Section.vue";
