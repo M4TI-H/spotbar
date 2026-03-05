@@ -38,6 +38,11 @@ const handleOpenSectionForm = () => {
   </div>
   <p class="text-sm text-gray-400 px-3">{{ section.description }}</p>
   <div class="grid grid-cols-1 gap-4 mt-2 px-2">
-    <MenuItem v-for="item in section.items" :key="item.id" :item="item" />
+    <MenuItem
+      v-for="item in section.items"
+      :key="item.id"
+      :item="item"
+      :sectionLength="section.items.length"
+    />
   </div>
 </template>

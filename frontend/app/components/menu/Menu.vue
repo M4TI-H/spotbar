@@ -41,9 +41,9 @@ const groupedMenu = computed(() => {
     .map((section) => {
       return {
         ...section,
-        items: menuStore.menuItems.filter(
-          (item) => item.section_id === section.id,
-        ),
+        items: menuStore.menuItems
+          .sort((a, b) => a.position - b.position)
+          .filter((item) => item.section_id === section.id),
       };
     });
 });

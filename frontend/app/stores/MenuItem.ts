@@ -26,6 +26,16 @@ export const useMenuItemStore = defineStore("menuItem", {
       }
     },
     openEmpty(sectionId?: string) {
+      const menuStore = useMenuStore();
+      const sectionItems = menuStore.menuItems.filter(
+        (i) => i.section_id === sectionId,
+      );
+
+      const initialPosition =
+        sectionItems.length > 0
+          ? Math.max(...sectionItems.map((i) => i.position)) + 1
+          : 1;
+
       this.isOpened = true;
       this.data = {
         id: crypto.randomUUID(),
@@ -33,6 +43,7 @@ export const useMenuItemStore = defineStore("menuItem", {
         category_id: "",
         name: "",
         price: 0,
+        position: initialPosition,
         ingredients: [],
         description: "",
         metadata: {
@@ -40,6 +51,7 @@ export const useMenuItemStore = defineStore("menuItem", {
         },
       };
     },
+
     close() {
       this.isOpened = false;
       this.data = null;

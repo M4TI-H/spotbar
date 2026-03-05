@@ -49,7 +49,7 @@ const buttonAction = (type: string) => {
       >
         <i class="pi pi-eye-slash"></i>
         <div class="w-full flex items-center justify-between min-w-0">
-          <span>Hide attribute</span>
+          <span>Hide attribute in</span>
           <i class="pi pi-chevron-right text-[8px]"></i>
         </div>
       </button>

@@ -68,6 +68,7 @@ const loadSampleMenu = async () => {
       category_id: "cat_01",
       name: "Legendary Brown Spirits Long Island",
       price: 99,
+      position: 2,
       ingredients: [
         "Wild Turkey Rare Bread",
         "Remy Martin VSOP",
@@ -84,6 +85,7 @@ const loadSampleMenu = async () => {
       category_id: "cat_01",
       name: "Ultimate Negroni",
       price: 69,
+      position: 1,
       ingredients: [
         "Bareksten Botanical Gin",
         "Campari Cask Tale",
@@ -98,6 +100,7 @@ const loadSampleMenu = async () => {
       category_id: "cat_01",
       name: "Gdańsk & Stormy",
       price: 43,
+      position: 2,
       ingredients: [
         "Angostura 5yo Rum",
         "Goldwasser",
@@ -115,6 +118,7 @@ const loadSampleMenu = async () => {
       category_id: "cat_01",
       name: "Basil Gimlet",
       price: 42,
+      position: 1,
       ingredients: ["Citadelle Gin", "Basil", "Lime", "Lime leaves"],
       description: "Fresh, herbal and perfectly balanced sour.",
       metadata: { hidden_attrs: [] },

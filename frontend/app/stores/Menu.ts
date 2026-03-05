@@ -87,6 +87,35 @@ export const useMenuStore = defineStore("menu", {
         }
       });
     },
+    reorderItems(itemId: string, step: number) {
+      const item = this.menuItems.find((i) => i.id === itemId);
+      if (!item) return;
+
+      const oldPosition = item.position;
+      const newPosition = oldPosition + step;
+
+      const sectionItems = this.menuItems.filter(
+        (i) => i.section_id === item.section_id,
+      );
+
+      if (newPosition < 1 || newPosition > sectionItems.length) return;
+
+      sectionItems.forEach((i) => {
+        if (i.id === itemId) return;
+
+        if (step < 0) {
+          if (i.position >= newPosition && i.position < oldPosition) {
+            i.position += 1;
+          }
+        } else if (step > 0) {
+          if (i.position <= newPosition && i.position > oldPosition) {
+            i.position -= 1;
+          }
+        }
+      });
+
+      item.position = newPosition;
+    },
     async fetchCategories() {
       if (this.categories.length > 0) return;
 

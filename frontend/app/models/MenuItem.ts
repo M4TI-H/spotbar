@@ -4,6 +4,7 @@ export default interface MenuItem {
   category_id: string;
   name: string;
   price: number;
+  position: number;
   ingredients?: string[];
   description?: string;
   metadata: MenuItemMetadata | null;
