@@ -58,42 +58,46 @@ const saveChanges = async () => {
   if (!localData.value) return;
 
   try {
-    pendingGlobalAttributes.value.forEach((attr) => {
-      const key = attr.label.toLowerCase().replace(/\s+/g, "_");
-      const defaultValue = attr.type === "number" ? 0 : "";
-
-      const applyToItem = (item: any) => {
-        if (!item.metadata) item.metadata = {};
-        item[key] = defaultValue;
-        item.metadata[key] = {
-          type: attr.type,
-          suffix: attr.suffix,
-          label: attr.label,
-          visibility: attr.visibility,
-        };
-      };
-
-      if (attr.visibility === "section") {
-        const sectionId = localData.value!.section_id;
-        menuStore.menuItems
-          .filter(
-            (item) =>
-              item.section_id === sectionId && item.id !== localData.value?.id,
-          )
-          .forEach(applyToItem);
-      } else if (attr.visibility === "all") {
-        menuStore.menuItems
-          .filter((item) => item.id !== localData.value?.id)
-          .forEach(applyToItem);
-      }
-    });
-
     const success = await menuStore.save(localData.value);
-
     if (success) {
-      pendingGlobalAttributes.value = [];
-      menuItemStore.close();
+      pendingAttributeDeletions.value.forEach((toDeletion) => {
+        menuStore.deleteAttribute(
+          localData.value!.id,
+          toDeletion.field,
+          toDeletion.scope as any,
+          localData.value?.section_id ?? "",
+        );
+      });
+
+      pendingGlobalAttributes.value.forEach((attr) => {
+        const key = attr.label.toLowerCase().replace(/\s+/g, "_");
+        const currentValue = (localData.value as any)[key];
+
+        // copy attribute key and value to new specific item
+        const applyToItem = (item: any) => {
+          if (!item.metadata) item.metadata = { hidden_attrs: [] };
+          item[key] = currentValue;
+          item.metadata[key] = { ...attr };
+        };
+
+        if (attr.visibility === "section") {
+          const sectionId = localData.value!.section_id;
+          menuStore.menuItems
+            .filter(
+              (i) => i.section_id === sectionId && i.id !== localData.value?.id,
+            )
+            .forEach(applyToItem);
+        } else if (attr.visibility === "all") {
+          menuStore.menuItems
+            .filter((i) => i.id !== localData.value?.id)
+            .forEach(applyToItem);
+        }
+      });
     }
+
+    pendingGlobalAttributes.value = [];
+    pendingAttributeDeletions.value = [];
+    menuItemStore.close();
   } catch (err: any) {
     console.error("Save failed:", err);
   }
@@ -123,6 +127,7 @@ watch(
   { immediate: true },
 );
 
+const pendingAttributeDeletions = ref<{ field: string; scope: string }[]>([]);
 const handleAttributeAction = (payload: {
   mode: string;
   scope: string;
@@ -146,16 +151,18 @@ const handleAttributeAction = (payload: {
       }
     }
 
-    if (localData.value && localData.value.section_id) {
-      menuStore.deleteAttribute(
-        localData.value.id,
-        fieldName,
-        payload.scope as any,
-        localData.value?.section_id,
-      );
-    } else {
-      console.log("Failed to delete attribute", payload.field);
+    // add to list of attributes pending to deletion
+    if (payload.scope !== "item") {
+      pendingAttributeDeletions.value.push({
+        field: fieldName,
+        scope: payload.scope,
+      });
     }
+
+    // remove from pending new attribute list
+    pendingGlobalAttributes.value = pendingGlobalAttributes.value.filter(
+      (attr) => attr.label.toLowerCase().replace(/\s+/g, "_") !== fieldName,
+    );
   }
 };
 
