@@ -19,6 +19,6 @@ export interface CustomAttribute {
   label: string;
   type: string;
   suffix: string;
-  value: string | number;
+  value?: string | number;
   visibility: string;
 }

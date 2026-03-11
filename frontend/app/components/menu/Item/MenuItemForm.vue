@@ -54,12 +54,71 @@ const addCustomField = (attr: CustomAttribute) => {
   }
 };
 
+const pendingAttributeDeletions = ref<{ field: string; scope: string }[]>([]);
+const pendingAttributeDuplications = ref<{ field: string; scope: string }[]>(
+  [],
+);
+const handleAttributeAction = (payload: {
+  mode: string;
+  scope: string;
+  field: string;
+}) => {
+  if (!payload || !payload.mode) {
+    console.error("Missing payload in handleAttributeAction");
+    return;
+  }
+
+  const fieldName = payload.field;
+
+  if (payload.mode === "delete") {
+    //remove local copy of deleted data
+    if (localData.value) {
+      if (fieldName in localData.value) {
+        delete (localData.value as any)[fieldName];
+      }
+      if (localData.value.metadata && localData.value.metadata[fieldName]) {
+        delete localData.value.metadata[fieldName];
+      }
+    }
+
+    // add to list of attributes pending to deletion
+    if (payload.scope !== "item") {
+      pendingAttributeDeletions.value.push({
+        field: fieldName,
+        scope: payload.scope,
+      });
+    }
+
+    // remove from pending new attribute list
+    pendingGlobalAttributes.value = pendingGlobalAttributes.value.filter(
+      (attr) => attr.label.toLowerCase().replace(/\s+/g, "_") !== fieldName,
+    );
+  } else if (payload.mode === "duplicate") {
+    if (payload.scope !== "item") {
+      pendingAttributeDuplications.value =
+        pendingAttributeDuplications.value.filter(
+          (dup) => dup.field !== fieldName,
+        );
+
+      pendingAttributeDuplications.value.push({
+        field: fieldName,
+        scope: payload.scope,
+      });
+    }
+    pendingAttributeDeletions.value = pendingAttributeDeletions.value.filter(
+      (del) => del.field !== fieldName,
+    );
+  }
+};
+
 const saveChanges = async () => {
   if (!localData.value) return;
 
   try {
     const success = await menuStore.save(localData.value);
+
     if (success) {
+      //delete pending attributes
       pendingAttributeDeletions.value.forEach((toDeletion) => {
         menuStore.deleteAttribute(
           localData.value!.id,
@@ -69,11 +128,11 @@ const saveChanges = async () => {
         );
       });
 
+      //add pending attributes
       pendingGlobalAttributes.value.forEach((attr) => {
         const key = attr.label.toLowerCase().replace(/\s+/g, "_");
         const currentValue = (localData.value as any)[key];
 
-        // copy attribute key and value to new specific item
         const applyToItem = (item: any) => {
           if (!item.metadata) item.metadata = { hidden_attrs: [] };
           item[key] = currentValue;
@@ -93,10 +152,28 @@ const saveChanges = async () => {
             .forEach(applyToItem);
         }
       });
+
+      //duplicate values of pending attributes
+      pendingAttributeDuplications.value.forEach((duplication) => {
+        const key = duplication.field;
+        const currentValue = (localData.value as any)[key];
+        const existingMeta = localData.value?.metadata?.[key];
+
+        menuStore.duplicateAttributeValue(
+          localData.value!.id,
+          key,
+          duplication.scope as any,
+          localData.value?.section_id ?? "",
+          currentValue,
+          existingMeta,
+        );
+      });
     }
 
     pendingGlobalAttributes.value = [];
     pendingAttributeDeletions.value = [];
+    pendingAttributeDuplications.value = [];
+
     menuItemStore.close();
   } catch (err: any) {
     console.error("Save failed:", err);
@@ -126,45 +203,6 @@ watch(
   },
   { immediate: true },
 );
-
-const pendingAttributeDeletions = ref<{ field: string; scope: string }[]>([]);
-const handleAttributeAction = (payload: {
-  mode: string;
-  scope: string;
-  field: string;
-}) => {
-  if (!payload || !payload.mode) {
-    console.error("Missing payload in handleAttributeAction");
-    return;
-  }
-
-  if (payload.mode === "delete") {
-    const fieldName = payload.field;
-
-    //remove local copy of deleted data
-    if (localData.value) {
-      if (fieldName in localData.value) {
-        delete (localData.value as any)[fieldName];
-      }
-      if (localData.value.metadata && localData.value.metadata[fieldName]) {
-        delete localData.value.metadata[fieldName];
-      }
-    }
-
-    // add to list of attributes pending to deletion
-    if (payload.scope !== "item") {
-      pendingAttributeDeletions.value.push({
-        field: fieldName,
-        scope: payload.scope,
-      });
-    }
-
-    // remove from pending new attribute list
-    pendingGlobalAttributes.value = pendingGlobalAttributes.value.filter(
-      (attr) => attr.label.toLowerCase().replace(/\s+/g, "_") !== fieldName,
-    );
-  }
-};
 
 onMounted(() => {
   if (localData.value && localData.value.name !== "") {

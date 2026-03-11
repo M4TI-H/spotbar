@@ -198,6 +198,32 @@ export const useMenuStore = defineStore("menu", {
         this.menuItems.forEach((item) => removeFromItem(item));
       }
     },
+    duplicateAttributeValue(
+      item_id: string,
+      attribute_name: string,
+      scope: "item" | "section" | "menu",
+      section_id: string,
+      value: any,
+      metadata?: any,
+    ) {
+      const duplicateValue = (item: any) => {
+        item[attribute_name] = value;
+
+        if (metadata) {
+          if (!item.metadata) item.metadata = { hidden_attrs: [] };
+          item.metadata[attribute_name] = { ...metadata };
+        }
+      };
+
+      if (scope === "section") {
+        if (!section_id) return;
+        this.menuItems
+          .filter((item) => item.section_id === section_id)
+          .forEach((item) => duplicateValue(item));
+      } else if (scope === "menu") {
+        this.menuItems.forEach((item) => duplicateValue(item));
+      }
+    },
     async save(updatedItem: MenuItem) {
       try {
         const index = this.menuItems.findIndex(
