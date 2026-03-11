@@ -5,6 +5,7 @@ import SelectSection from "./SelectSection.vue";
 import SelectCategory from "./SelectCategory.vue";
 import CustomAttributeField from "./CustomAttributeField.vue";
 import type { CustomAttribute } from "~/models/MenuItem";
+import HiddenAttributes from "./HiddenAttributes.vue";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
@@ -58,6 +59,8 @@ const pendingAttributeDeletions = ref<{ field: string; scope: string }[]>([]);
 const pendingAttributeDuplications = ref<{ field: string; scope: string }[]>(
   [],
 );
+const pendingAttributesToHide = ref<{ field: string; scope: string }[]>([]);
+
 const handleAttributeAction = (payload: {
   mode: string;
   scope: string;
@@ -108,6 +111,31 @@ const handleAttributeAction = (payload: {
     pendingAttributeDeletions.value = pendingAttributeDeletions.value.filter(
       (del) => del.field !== fieldName,
     );
+  } else if (payload.mode === "hide") {
+    if (localData.value) {
+      if (!localData.value.metadata) {
+        localData.value.metadata = { hidden_attrs: [] };
+      }
+      if (!localData.value.metadata.hidden_attrs) {
+        localData.value.metadata.hidden_attrs = [];
+      }
+
+      //add to hidden_attrs if not there yet
+      if (!localData.value.metadata.hidden_attrs.includes(fieldName)) {
+        localData.value.metadata.hidden_attrs.push(fieldName);
+      }
+
+      if (payload.scope !== "item") {
+        pendingAttributesToHide.value = pendingAttributesToHide.value.filter(
+          (h) => h.field !== fieldName,
+        );
+
+        pendingAttributesToHide.value.push({
+          field: fieldName,
+          scope: payload.scope,
+        });
+      }
+    }
   }
 };
 
@@ -119,11 +147,21 @@ const saveChanges = async () => {
 
     if (success) {
       //delete pending attributes
-      pendingAttributeDeletions.value.forEach((toDeletion) => {
+      pendingAttributeDeletions.value.forEach((toDelete) => {
         menuStore.deleteAttribute(
           localData.value!.id,
-          toDeletion.field,
-          toDeletion.scope as any,
+          toDelete.field,
+          toDelete.scope as any,
+          localData.value?.section_id ?? "",
+        );
+      });
+
+      //hide pending attributes
+      pendingAttributesToHide.value.forEach((toHide) => {
+        menuStore.hideAttribute(
+          localData.value!.id,
+          toHide.field,
+          toHide.scope as any,
           localData.value?.section_id ?? "",
         );
       });
@@ -160,7 +198,6 @@ const saveChanges = async () => {
         const existingMeta = localData.value?.metadata?.[key];
 
         menuStore.duplicateAttributeValue(
-          localData.value!.id,
           key,
           duplication.scope as any,
           localData.value?.section_id ?? "",
@@ -204,6 +241,24 @@ watch(
   { immediate: true },
 );
 
+const hiddenAttributesList = computed(() => {
+  const hiddenKeys = localData.value?.metadata?.hidden_attrs;
+  if (!hiddenKeys || !hiddenKeys.length || !localData.value) return [];
+
+  return hiddenKeys.map((key) => {
+    const value = (localData.value as any)[key];
+
+    const meta = localData.value?.metadata?.[key];
+
+    return {
+      key: key,
+      label: meta?.label,
+      value: value,
+      suffix: meta?.suffix || "",
+    };
+  });
+});
+
 onMounted(() => {
   if (localData.value && localData.value.name !== "") {
     initialName.value = localData.value.name;
@@ -217,9 +272,9 @@ onMounted(() => {
   >
     <div
       v-if="localData"
-      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md flex flex-col"
+      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md flex flex-col p-4"
     >
-      <div class="flex items-center justify-between p-4">
+      <div class="flex items-center justify-between">
         <h1 class="text-xl font-semibold text-gray-800">
           {{ initialName ? `Modifying ${initialName}` : "New menu item" }}
         </h1>
@@ -231,7 +286,7 @@ onMounted(() => {
         </button>
       </div>
 
-      <div class="p-4 overflow-y-auto max-h-[80vh]">
+      <div class="overflow-y-auto max-h-[80vh]">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SelectSection v-model="localData.section_id" />
           <SelectCategory v-model="localData.category_id" />
@@ -296,15 +351,12 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="w-full flex items-center gap-2">
-        <div class="w-1/30 h-px bg-gray-300"></div>
-        <h2 class="text-gray-500 uppercase whitespace-nowrap">
-          Custom attributes
-        </h2>
-        <div class="w-full h-px bg-gray-300"></div>
-      </div>
-      <div class="p-2">
+      <div class="flex flex-col gap-6 py-4">
         <CustomAttributeField @addAttribute="addCustomField" />
+        <HiddenAttributes
+          v-if="localData.metadata?.hidden_attrs?.length"
+          :attributes="hiddenAttributesList"
+        />
       </div>
 
       <div

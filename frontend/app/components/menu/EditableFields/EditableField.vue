@@ -7,7 +7,6 @@ defineProps<{
   item_id: string;
   label: string;
   type: string;
-  isHideable?: boolean;
   suffix?: string;
   section_id?: string;
 }>();

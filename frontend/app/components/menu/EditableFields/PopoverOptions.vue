@@ -74,7 +74,7 @@ const buttonAction = (range: "item" | "section" | "menu") => {
       <button
         v-if="!requiredType"
         @mouseenter="showInternal($event, 'hide')"
-        class="w-full py-2 px-3 rounded-t-md text-left text-xs text-gray-500 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+        class="w-full py-2 px-3 text-left text-xs text-gray-500 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
       >
         <i class="pi pi-eye-slash"></i>
         <div class="w-full flex items-center justify-between min-w-0">
@@ -85,9 +85,9 @@ const buttonAction = (range: "item" | "section" | "menu") => {
       <button
         v-if="!requiredType"
         @mouseenter="showInternal($event, 'delete')"
-        class="w-full py-2 px-3 rounded-t-md text-left text-xs text-red-500 bg-red-100 hover:bg-red-200 flex items-center gap-2 cursor-pointer"
+        class="w-full py-2 px-3 rounded-b-md text-left text-xs text-red-500 bg-red-100 hover:bg-red-200 flex items-center gap-2 cursor-pointer"
       >
-        <i class="pi pi-eye-slash"></i>
+        <i class="pi pi-trash"></i>
         <div class="w-full flex items-center justify-between min-w-0">
           <span>Delete attribute in</span>
           <i class="pi pi-chevron-right text-[8px]"></i>

@@ -199,7 +199,6 @@ export const useMenuStore = defineStore("menu", {
       }
     },
     duplicateAttributeValue(
-      item_id: string,
       attribute_name: string,
       scope: "item" | "section" | "menu",
       section_id: string,
@@ -222,6 +221,34 @@ export const useMenuStore = defineStore("menu", {
           .forEach((item) => duplicateValue(item));
       } else if (scope === "menu") {
         this.menuItems.forEach((item) => duplicateValue(item));
+      }
+    },
+    // W menuStore
+    hideAttribute(
+      item_id: string,
+      attribute_name: string,
+      scope: "item" | "section" | "menu",
+      section_id: string,
+    ) {
+      const applyHide = (item: any) => {
+        if (!item.metadata) item.metadata = { hidden_attrs: [] };
+        if (!item.metadata.hidden_attrs) item.metadata.hidden_attrs = [];
+
+        if (!item.metadata.hidden_attrs.includes(attribute_name)) {
+          item.metadata.hidden_attrs.push(attribute_name);
+        }
+      };
+
+      if (scope === "item") {
+        const item = this.menuItems.find((i) => i.id === item_id);
+        if (item) applyHide(item);
+      } else if (scope === "section") {
+        if (!section_id) return;
+        this.menuItems
+          .filter((item) => item.section_id === section_id)
+          .forEach(applyHide);
+      } else if (scope === "menu") {
+        this.menuItems.forEach(applyHide);
       }
     },
     async save(updatedItem: MenuItem) {
