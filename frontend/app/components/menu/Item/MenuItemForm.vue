@@ -28,39 +28,29 @@ const getSuffix = (key: string) => {
   return undefined;
 };
 
+//pending attributes that will be added to other items after form submission
+const pendingGlobalAttributes = ref<CustomAttribute[]>([]);
+
 const addCustomField = (attr: CustomAttribute) => {
   if (!localData.value) return;
 
   const key = attr.label.toLowerCase().replace(/\s+/g, "_");
   const defaultValue = attr.type === "number" ? 0 : "";
 
-  const applyToItem = (item: any) => {
-    if (!item.metadata) item.metadata = {};
+  if (!localData.value.metadata) {
+    localData.value.metadata = { hidden_attrs: [] };
+  }
 
-    item[key] = defaultValue;
-
-    item.metadata[key] = {
-      type: attr.type,
-      suffix: attr.suffix,
-      label: attr.label,
-      visibility: attr.visibility,
-    };
+  (localData.value as any)[key] = defaultValue;
+  localData.value.metadata[key] = {
+    type: attr.type,
+    suffix: attr.suffix,
+    label: attr.label,
+    visibility: attr.visibility,
   };
 
-  applyToItem(localData.value);
-
-  if (attr.visibility === "section") {
-    const sectionId = localData.value.section_id;
-    menuStore.menuItems
-      .filter(
-        (item) =>
-          item.section_id === sectionId && item.id !== localData.value?.id,
-      )
-      .forEach((item) => applyToItem(item));
-  } else if (attr.visibility === "all") {
-    menuStore.menuItems
-      .filter((item) => item.id !== localData.value?.id)
-      .forEach((item) => applyToItem(item));
+  if (attr.visibility !== "single") {
+    pendingGlobalAttributes.value.push({ ...attr });
   }
 };
 
@@ -68,29 +58,44 @@ const saveChanges = async () => {
   if (!localData.value) return;
 
   try {
-    //data has been saved
+    pendingGlobalAttributes.value.forEach((attr) => {
+      const key = attr.label.toLowerCase().replace(/\s+/g, "_");
+      const defaultValue = attr.type === "number" ? 0 : "";
+
+      const applyToItem = (item: any) => {
+        if (!item.metadata) item.metadata = {};
+        item[key] = defaultValue;
+        item.metadata[key] = {
+          type: attr.type,
+          suffix: attr.suffix,
+          label: attr.label,
+          visibility: attr.visibility,
+        };
+      };
+
+      if (attr.visibility === "section") {
+        const sectionId = localData.value!.section_id;
+        menuStore.menuItems
+          .filter(
+            (item) =>
+              item.section_id === sectionId && item.id !== localData.value?.id,
+          )
+          .forEach(applyToItem);
+      } else if (attr.visibility === "all") {
+        menuStore.menuItems
+          .filter((item) => item.id !== localData.value?.id)
+          .forEach(applyToItem);
+      }
+    });
+
     const success = await menuStore.save(localData.value);
 
     if (success) {
-      //check if correct data has been saved (the same values)
-      const savedItem = menuStore.menuItems.find(
-        (i) => i.id === localData.value?.id,
-      );
-
-      const isCorrect =
-        JSON.stringify(savedItem) === JSON.stringify(localData.value);
-
-      console.log(localData.value);
-      if (isCorrect) {
-        menuItemStore.close();
-      }
-    } else {
-      console.log("Failed to save changes. Try again.");
+      pendingGlobalAttributes.value = [];
+      menuItemStore.close();
     }
   } catch (err: any) {
-    console.log("Server has failed.");
-  } finally {
-    //loading spinner
+    console.error("Save failed:", err);
   }
 };
 
@@ -118,10 +123,41 @@ watch(
   { immediate: true },
 );
 
-const activeSectionName = computed(() => {
-  return menuStore.sections.find((s) => s.id === localData.value?.section_id)
-    ?.name;
-});
+const handleAttributeAction = (payload: {
+  mode: string;
+  scope: string;
+  field: string;
+}) => {
+  if (!payload || !payload.mode) {
+    console.error("Missing payload in handleAttributeAction");
+    return;
+  }
+
+  if (payload.mode === "delete") {
+    const fieldName = payload.field;
+
+    //remove local copy of deleted data
+    if (localData.value) {
+      if (fieldName in localData.value) {
+        delete (localData.value as any)[fieldName];
+      }
+      if (localData.value.metadata && localData.value.metadata[fieldName]) {
+        delete localData.value.metadata[fieldName];
+      }
+    }
+
+    if (localData.value && localData.value.section_id) {
+      menuStore.deleteAttribute(
+        localData.value.id,
+        fieldName,
+        payload.scope as any,
+        localData.value?.section_id,
+      );
+    } else {
+      console.log("Failed to delete attribute", payload.field);
+    }
+  }
+};
 
 onMounted(() => {
   if (localData.value && localData.value.name !== "") {
@@ -164,15 +200,18 @@ onMounted(() => {
                 key !== 'id' &&
                 key !== 'section_id' &&
                 key !== 'category_id' &&
+                key !== 'position' &&
                 key !== 'description' &&
                 key !== 'ingredients' &&
                 key !== 'metadata'
               "
+              :item_id="localData.id"
               :label="String(key)"
               :type="getFieldType(value)"
               :suffix="getSuffix(String(key))"
-              :section="activeSectionName"
+              :section_id="localData.section_id"
               v-model="localData[key]"
+              @attributeAction="handleAttributeAction"
             />
           </template>
 

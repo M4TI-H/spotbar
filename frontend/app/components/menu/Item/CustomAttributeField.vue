@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { CustomAttribute } from "~/models/MenuItem";
 
-const menuItemStore = useMenuItemStore();
-
 const emit = defineEmits<{
   (e: "addAttribute", attribute: CustomAttribute): void;
 }>();

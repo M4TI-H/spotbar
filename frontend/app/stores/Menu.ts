@@ -170,6 +170,34 @@ export const useMenuStore = defineStore("menu", {
         this.isLoadingCategories = false;
       }
     },
+    deleteAttribute(
+      item_id: string,
+      attribute_name: string,
+      scope: "item" | "section" | "menu",
+      section_id: string,
+    ) {
+      const removeFromItem = (item: any) => {
+        if (item[attribute_name] !== undefined) {
+          delete item[attribute_name];
+        }
+        if (item.metadata && item.metadata[attribute_name]) {
+          delete item.metadata[attribute_name];
+        }
+      };
+
+      if (scope === "item") {
+        const item = this.menuItems.find((i) => i.id === item_id);
+        if (item) removeFromItem(item);
+      } else if (scope === "section") {
+        if (!section_id) return;
+
+        this.menuItems
+          .filter((item) => item.section_id === section_id)
+          .forEach((item) => removeFromItem(item));
+      } else if (scope === "menu") {
+        this.menuItems.forEach((item) => removeFromItem(item));
+      }
+    },
     async save(updatedItem: MenuItem) {
       try {
         const index = this.menuItems.findIndex(
