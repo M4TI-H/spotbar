@@ -33,11 +33,14 @@ const handleUnhideAction = (scope: string) => {
   });
 };
 
-const formatDisplayValue = (value: any, key: string) => {
+const formatDisplayValue = (value: any) => {
   if (typeof value === "number") {
-    return value.toFixed(2);
+    return isNaN(value) ? "" : value.toFixed(2);
   }
-  return value;
+
+  if (!value) return "";
+
+  return String(value);
 };
 </script>
 
@@ -77,7 +80,7 @@ const formatDisplayValue = (value: any, key: string) => {
             :class="{ 'pr-12': attr.suffix }"
             class="w-full px-3 py-2 border border-dashed border-gray-400 bg-gray-50 rounded-md text-sm text-gray-500 overflow-hidden text-ellipsis whitespace-nowrap"
           >
-            {{ formatDisplayValue(attr.value, attr.key) }}
+            {{ formatDisplayValue(attr.value) || "\u00A0" }}
           </div>
 
           <div

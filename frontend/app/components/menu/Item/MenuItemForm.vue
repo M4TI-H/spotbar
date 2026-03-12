@@ -330,6 +330,7 @@ onMounted(() => {
           <template v-for="(value, key) in localData" :key="key">
             <EditableField
               v-if="
+                !localData.metadata?.hidden_attrs?.includes(String(key)) &&
                 isSimpleField(value) &&
                 key !== 'id' &&
                 key !== 'section_id' &&
