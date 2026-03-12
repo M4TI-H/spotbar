@@ -40,12 +40,12 @@ const showInternal = (event: any, mode: string) => {
   internalPopover.value?.show(event);
 };
 
-const buttonAction = (range: "item" | "section" | "menu") => {
+const buttonAction = (scope: "item" | "section" | "menu") => {
   if (!field_type.value) return;
 
   emit("action", {
     mode: popoverMode.value,
-    scope: range,
+    scope: scope,
     field: field_type.value,
   });
 

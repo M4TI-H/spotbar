@@ -251,6 +251,32 @@ export const useMenuStore = defineStore("menu", {
         this.menuItems.forEach(applyHide);
       }
     },
+    unhideAttribute(
+      item_id: string,
+      attribute_name: string,
+      scope: "item" | "section" | "menu",
+      section_id: string,
+    ) {
+      const applyUnhide = (item: any) => {
+        if (item.metadata && item.metadata.hidden_attrs) {
+          item.metadata.hidden_attrs = item.metadata.hidden_attrs.filter(
+            (key: string) => key !== attribute_name,
+          );
+        }
+      };
+
+      if (scope === "item") {
+        const item = this.menuItems.find((i) => i.id === item_id);
+        if (item) applyUnhide(item);
+      } else if (scope === "section") {
+        if (!section_id) return;
+        this.menuItems
+          .filter((item) => item.section_id === section_id)
+          .forEach(applyUnhide);
+      } else if (scope === "menu") {
+        this.menuItems.forEach(applyUnhide);
+      }
+    },
     async save(updatedItem: MenuItem) {
       try {
         const index = this.menuItems.findIndex(

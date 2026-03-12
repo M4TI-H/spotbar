@@ -60,6 +60,7 @@ const pendingAttributeDuplications = ref<{ field: string; scope: string }[]>(
   [],
 );
 const pendingAttributesToHide = ref<{ field: string; scope: string }[]>([]);
+const pendingAttributesToUnhide = ref<{ field: string; scope: string }[]>([]);
 
 const handleAttributeAction = (payload: {
   mode: string;
@@ -136,6 +137,28 @@ const handleAttributeAction = (payload: {
         });
       }
     }
+  } else if (payload.mode === "unhide") {
+    if (localData.value && localData.value.metadata?.hidden_attrs) {
+      localData.value.metadata.hidden_attrs =
+        localData.value.metadata.hidden_attrs.filter(
+          (key) => key !== fieldName,
+        );
+
+      if (payload.scope !== "item") {
+        pendingAttributesToUnhide.value =
+          pendingAttributesToUnhide.value.filter((u) => u.field !== fieldName);
+
+        pendingAttributesToUnhide.value.push({
+          field: fieldName,
+          scope: payload.scope,
+        });
+      }
+
+      // Ważne: Jeśli to pole miało być ukryte (zanim kliknięto Save), wywalamy je z poczekalni ukrywania
+      pendingAttributesToHide.value = pendingAttributesToHide.value.filter(
+        (h) => h.field !== fieldName,
+      );
+    }
   }
 };
 
@@ -146,6 +169,16 @@ const saveChanges = async () => {
     const success = await menuStore.save(localData.value);
 
     if (success) {
+      //unhide pending attributes
+      pendingAttributesToUnhide.value.forEach((toUnhide) => {
+        menuStore.unhideAttribute(
+          localData.value!.id,
+          toUnhide.field,
+          toUnhide.scope as any,
+          localData.value?.section_id ?? "",
+        );
+      });
+
       //delete pending attributes
       pendingAttributeDeletions.value.forEach((toDelete) => {
         menuStore.deleteAttribute(
@@ -207,6 +240,7 @@ const saveChanges = async () => {
       });
     }
 
+    pendingAttributesToUnhide.value = [];
     pendingGlobalAttributes.value = [];
     pendingAttributeDeletions.value = [];
     pendingAttributeDuplications.value = [];
@@ -356,6 +390,8 @@ onMounted(() => {
         <HiddenAttributes
           v-if="localData.metadata?.hidden_attrs?.length"
           :attributes="hiddenAttributesList"
+          :section_id="localData.section_id!"
+          @unhide="handleAttributeAction"
         />
       </div>
 
