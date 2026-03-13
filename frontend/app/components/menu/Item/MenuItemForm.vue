@@ -320,7 +320,7 @@ onMounted(() => {
         </button>
       </div>
 
-      <div class="overflow-y-auto max-h-[80vh]">
+      <div class="overflow-y-auto max-h-[80vh] mt-2">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SelectSection v-model="localData.section_id" />
           <SelectCategory v-model="localData.category_id" />
@@ -366,10 +366,18 @@ onMounted(() => {
             v-if="localData.ingredients"
             class="md:col-span-3 flex flex-col gap-1"
           >
-            <label
-              class="text-[10px] font-bold uppercase text-gray-400 tracking-wider ml-1"
-              >Ingredients</label
-            >
+            <div class="w-full flex items-center justify-between">
+              <label
+                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
+                >Ingredients</label
+              >
+              <p
+                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
+              >
+                Use commas to separate ingredients
+              </p>
+            </div>
+
             <textarea
               :value="localData.ingredients.join(', ')"
               @input="

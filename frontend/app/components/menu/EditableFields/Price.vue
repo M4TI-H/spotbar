@@ -9,6 +9,7 @@ const displayValue = ref(model.value?.toFixed(2) || "0.00");
 
 defineProps<{
   suffix?: string;
+  error: boolean;
 }>();
 
 const formatNumber = (val: number | null | undefined) => {
@@ -64,8 +65,11 @@ onMounted(() => {
       @input="handleInput"
       @blur="formatOnBlur"
       @focus="selectAll"
-      :class="{ 'pr-12': suffix }"
       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm text-gray-700"
+      :class="{
+        'text-red-500 border-red-300 bg-red-100': error,
+        'pr-12': suffix,
+      }"
       type="text"
       inputmode="decimal"
       placeholder="0.00"
