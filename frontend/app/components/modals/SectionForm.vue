@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type Section from "~/models/Section";
+import { useField } from "vee-validate";
+import { z } from "zod";
+import { toTypedSchema } from "@vee-validate/zod";
 
 const menuStore = useMenuStore();
 const modalStore = useModalStore();
@@ -8,6 +11,47 @@ const localData = ref<Section | null>(null);
 const props = defineProps<{
   data?: any;
 }>();
+
+const errorWarning = ref<boolean>(false);
+const hoverWarning = ref<boolean>(false);
+
+const {
+  value: fieldNameValue,
+  validate,
+  errorMessage,
+} = useField<string>(
+  "fieldNameValue",
+  toTypedSchema(z.string().min(1, "Section name cannot be empty.")),
+  {
+    initialValue: props.data?.name || "",
+  },
+);
+
+const handleBlurValidation = async () => {
+  fieldNameValue.value = localData.value?.name || "";
+
+  const result = await validate();
+  errorWarning.value = !result.valid;
+};
+
+watch(
+  () => localData.value?.name,
+  () => {
+    if (errorWarning.value) {
+      errorWarning.value = false;
+    }
+  },
+);
+
+const modalTitle = computed(() => {
+  if (localData.value?.id) {
+    const sectionName = menuStore.sections.find(
+      (i) => i.id === localData.value?.id,
+    )?.name;
+    return `Modify ${sectionName || ""}`;
+  }
+  return "Add section to the menu";
+});
 
 const positionOptions = computed(() => {
   const options = [{ label: "At the top", value: 1 }];
@@ -72,7 +116,7 @@ onMounted(() => {
   <div v-if="localData" class="flex flex-col gap-4">
     <div class="flex items-center justify-between">
       <h1 class="text-xl font-semibold text-gray-800">
-        Add section to the menu
+        {{ modalTitle }}
       </h1>
       <button
         @click="modalStore.close()"
@@ -81,18 +125,65 @@ onMounted(() => {
         <i class="pi pi-times text-gray-400 text-sm"></i>
       </button>
     </div>
-    <div class="flex flex-col gap-2">
-      <input
-        v-model="localData.name"
-        type="text"
-        placeholder="Section name"
-        class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm font-semibold placeholder:font-normal"
-      />
-      <textarea
-        v-model="localData.description"
-        placeholder="Section description"
-        class="w-full px-3 py-2 border text-gray-500 border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-16 text-sm resize-none"
-      ></textarea>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-0.5">
+        <div class="relative w-fit flex items-center gap-1 px-2">
+          <div
+            v-if="hoverWarning"
+            class="absolute px-2 py-1 ml-2 mb-9 rounded-md bg-black/50"
+          >
+            <p class="text-[10px] text-white whitespace-nowrap">
+              {{ errorMessage }}
+            </p>
+          </div>
+          <i
+            v-if="errorWarning"
+            @mouseenter="hoverWarning = true"
+            @mouseleave="hoverWarning = false"
+            class="pi pi-exclamation-circle text-xs text-red-500"
+          ></i>
+          <label
+            class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider"
+            >Name</label
+          >
+        </div>
+        <input
+          v-model="localData.name"
+          @blur="handleBlurValidation"
+          type="text"
+          class="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm font-semibold placeholder:font-normal"
+          :class="{
+            'border-red-400 focus:border-red-500 bg-red-50': errorWarning,
+          }"
+        />
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <div class="relative w-fit flex items-center gap-1 px-2">
+          <!-- <div
+          v-if="hoverWarning"
+          class="absolute px-2 py-1 ml-2 mb-9 rounded-md bg-black/50"
+        >
+          <p class="text-[10px] text-white whitespace-nowrap">
+            {{ errorMessage }}
+          </p>
+        </div>
+        <i
+          v-if="errorWarning"
+          @mouseenter="hoverWarning = true"
+          @mouseleave="hoverWarning = false"
+          class="pi pi-exclamation-circle text-xs text-red-500"
+        ></i> -->
+          <label
+            class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider"
+            >Description</label
+          >
+        </div>
+        <textarea
+          v-model="localData.description"
+          class="w-full px-3 py-2 border text-gray-500 border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-16 text-sm resize-none"
+        ></textarea>
+      </div>
     </div>
     <div class="w-full flex items-center justify-between pl-2">
       <p class="text-sm text-gray-500">Select position:</p>
