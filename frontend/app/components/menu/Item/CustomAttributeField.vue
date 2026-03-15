@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { CustomAttribute } from "~/models/MenuItem";
+import { useField } from "vee-validate";
+import { z } from "zod";
+import { toTypedSchema } from "@vee-validate/zod";
 
 const emit = defineEmits<{
   (e: "addAttribute", attribute: CustomAttribute): void;
@@ -8,7 +11,30 @@ const emit = defineEmits<{
 const isEdited = ref<boolean>(false);
 const newAttribute = ref<CustomAttribute | null>(null);
 
-const handleResetValue = () => {
+const {
+  value: labelValue,
+  validate: validateLabel,
+  errorMessage: labelError,
+  resetField: resetLabel,
+} = useField<string>(
+  "label",
+  toTypedSchema(z.string().min(1, "Label is required.").max(30, "Too long.")),
+  {
+    initialValue: "",
+  },
+);
+
+const {
+  value: suffixValue,
+  errorMessage: suffixError,
+  resetField: resetSuffix,
+} = useField<string>(
+  "suffix",
+  toTypedSchema(z.string().max(8, "Max 8 chars.")),
+  { initialValue: "" },
+);
+
+const startEditing = () => {
   newAttribute.value = {
     label: "",
     type: "text",
@@ -16,11 +42,23 @@ const handleResetValue = () => {
     value: "",
     visibility: "all",
   };
-  isEdited.value = !isEdited.value;
+  isEdited.value = true;
 };
 
-const handleConfirmNewAttribute = () => {
-  if (!newAttribute.value?.label.trim()) return;
+const handleResetValue = () => {
+  newAttribute.value = null;
+  isEdited.value = false;
+  resetLabel();
+  resetSuffix();
+};
+
+const handleConfirmNewAttribute = async () => {
+  const { valid } = await validateLabel();
+
+  if (!valid || !newAttribute.value) return;
+
+  newAttribute.value.label = labelValue.value;
+  newAttribute.value.suffix = suffixValue.value;
 
   emit("addAttribute", { ...newAttribute.value });
 
@@ -40,63 +78,68 @@ const handleConfirmNewAttribute = () => {
     <div class="col-span-3 pt-2 mx-2">
       <template v-if="!isEdited">
         <button
-          @click="handleResetValue"
+          @click="startEditing"
           class="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-200 text-gray-400 hover:border-emerald-300 hover:text-emerald-600 rounded-md transition-all text-xs font-semibold cursor-pointer w-fit"
         >
           <span>+</span> ADD CUSTOM ATTRIBUTE (GLASS, METHOD, ETC.)
         </button>
       </template>
       <template v-else-if="newAttribute">
-        <div class="w-full flex flex-col gap-2">
+        <form
+          @submit.prevent="handleConfirmNewAttribute"
+          class="w-full flex flex-col gap-2"
+        >
           <div class="w-sm flex gap-2">
             <button
-              @click="newAttribute.visibility = 'all'"
-              class="py-1 w-1/3 flex items-center justify-center gap-2 border rounded-md text-sm cursor-pointer transition-colors"
+              v-for="scope in ['all', 'section', 'single']"
+              :key="scope"
+              type="button"
+              @click="newAttribute.visibility = scope"
+              class="py-1 w-1/3 text-sm font-semibold border rounded-md cursor-pointer transition-all"
               :class="
-                newAttribute.visibility === 'all'
-                  ? 'bg-sky-100 border-sky-300 text-sky-500 hover:bg-sky-200'
-                  : 'bg-none border-gray-300 text-gray-400 hover:bg-gray-100'
+                newAttribute.visibility === scope
+                  ? 'bg-sky-100 border-sky-300 text-sky-500 shadow-sm'
+                  : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50'
               "
             >
-              All items
-            </button>
-            <button
-              @click="newAttribute.visibility = 'section'"
-              class="py-1 w-1/3 flex items-center justify-center gap-2 border rounded-md text-sm cursor-pointer transition-colors"
-              :class="
-                newAttribute.visibility === 'section'
-                  ? 'bg-sky-100 border-sky-300 text-sky-500 hover:bg-sky-200'
-                  : 'bg-none border-gray-300 text-gray-400 hover:bg-gray-100'
-              "
-            >
-              This section
-            </button>
-            <button
-              @click="newAttribute.visibility = 'single'"
-              class="py-1 w-1/3 flex items-center justify-center gap-2 border rounded-md text-sm cursor-pointer transition-colors"
-              :class="
-                newAttribute.visibility === 'single'
-                  ? 'bg-sky-100 border-sky-300 text-sky-500 hover:bg-sky-200'
-                  : 'bg-none border-gray-300 text-gray-400 hover:bg-gray-100'
-              "
-            >
-              This item only
+              {{
+                scope === "all"
+                  ? "All items"
+                  : scope === "section"
+                    ? "Section"
+                    : "This item"
+              }}
             </button>
           </div>
           <div>
-            <input
-              v-model="newAttribute.label"
-              type="text"
-              class="w-sm px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm text-gray-700"
-              placeholder="Attribute label"
-            />
-            <p class="text-gray-400 text-[12px] pl-2">
-              i.e. glass type, age, ABV.
-            </p>
+            <div class="w-sm relative">
+              <input
+                v-model="labelValue"
+                type="text"
+                maxlength="30"
+                class="w-full pl-3 pr-6 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm text-gray-700"
+                placeholder="Attribute label"
+              />
+              <p
+                class="absolute right-2 top-1/2 -translate-y-1/2 tracking-tight text-xs text-gray-500 pointer-events-none"
+              >
+                {{ newAttribute.label.length }}/30
+              </p>
+            </div>
+
+            <div class="w-sm px-2 flex items-center justify-between">
+              <p class="w-fit text-gray-400 text-[12px]">
+                i.e. glass type, age, ABV.
+              </p>
+              <p v-if="labelError" class="text-red-500 text-[12px]">
+                {{ labelError }}
+              </p>
+            </div>
           </div>
 
           <div class="w-sm flex items-center gap-2">
             <button
+              type="button"
               @click="newAttribute.type = 'text'"
               class="min-w-18 px-2 py-1 flex items-center justify-center gap-2 border rounded-md text-sm cursor-pointer transition-colors"
               :class="
@@ -109,6 +152,7 @@ const handleConfirmNewAttribute = () => {
               <span>Text</span>
             </button>
             <button
+              type="button"
               @click="newAttribute.type = 'number'"
               class="min-w-24 px-2 py-1 flex items-center justify-center gap-2 border rounded-md text-sm cursor-pointer transition-colors"
               :class="
@@ -122,27 +166,29 @@ const handleConfirmNewAttribute = () => {
             </button>
             <input
               v-if="newAttribute.type === 'number'"
-              v-model="newAttribute.suffix"
+              v-model="suffixValue"
               type="text"
-              class="w-full px-3 py-1 border border-gray-300 rounded-md focus:border-emerald-300 outline-0 transition-all text-sm text-gray-700"
+              maxlength="10"
+              class="w-full px-3 py-1 border border-gray-300 rounded-md focus:border-emerald-300 outline-0 text-sm text-gray-700 bg-white"
               placeholder="Suffix (optional)"
             />
           </div>
           <div class="w-sm flex items-center gap-2 justify-end">
             <button
+              type="button"
               @click="handleResetValue"
               class="hover:bg-gray-100 text-gray-400 text-sm py-1 px-3 rounded-md transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
-              @click="handleConfirmNewAttribute"
+              type="submit"
               class="py-1 px-3 text-sm text-emerald-500 rounded-md bg-emerald-100 border border-emerald-300 hover:bg-emerald-200 cursor-pointer transition-colors"
             >
               Confirm
             </button>
           </div>
-        </div>
+        </form>
       </template>
     </div>
   </div>

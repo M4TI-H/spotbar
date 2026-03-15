@@ -71,6 +71,8 @@ const positionOptions = computed(() => {
 });
 
 const handleSubmit = () => {
+  if (errorWarning.value) return;
+
   if (!localData.value || !localData.value.name?.trim()) return;
   try {
     menuStore.saveSection(localData.value);

@@ -45,8 +45,8 @@ const addCustomField = (attr: CustomAttribute) => {
   (localData.value as any)[key] = defaultValue;
   localData.value.metadata[key] = {
     type: attr.type,
-    suffix: attr.suffix,
-    label: attr.label,
+    suffix: attr.suffix.trim(),
+    label: attr.label.trim(),
     visibility: attr.visibility,
   };
 
@@ -350,47 +350,9 @@ onMounted(() => {
             />
           </template>
 
-          <div class="md:col-span-3 flex flex-col gap-1">
-            <label
-              class="text-[10px] font-bold uppercase text-gray-400 tracking-wider ml-1"
-              >Description</label
-            >
-            <textarea
-              v-model="localData.description"
-              class="w-full px-3 py-2 b border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all h-20 text-sm resize-none"
-              placeholder="Describe this item..."
-            ></textarea>
-          </div>
+          <MenuEditableFieldsDescription v-model="localData.description" />
 
-          <div
-            v-if="localData.ingredients"
-            class="md:col-span-3 flex flex-col gap-1"
-          >
-            <div class="w-full flex items-center justify-between">
-              <label
-                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
-                >Ingredients</label
-              >
-              <p
-                class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
-              >
-                Use commas to separate ingredients
-              </p>
-            </div>
-
-            <textarea
-              :value="localData.ingredients.join(', ')"
-              @input="
-                (e) =>
-                  (localData!.ingredients = (
-                    e.target as HTMLTextAreaElement
-                  ).value
-                    .split(',')
-                    .map((s) => s.trim()))
-              "
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 h-16 text-sm resize-none"
-            ></textarea>
-          </div>
+          <MenuEditableFieldsIngredients v-model="localData.ingredients" />
         </div>
       </div>
 
