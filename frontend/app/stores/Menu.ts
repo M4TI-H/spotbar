@@ -5,6 +5,7 @@ import type Section from "~/models/Section";
 
 export const useMenuStore = defineStore("menu", {
   state: () => ({
+    selectedBuilderSection: "upload" as string,
     menu: {} as any,
     menuItems: [] as MenuItem[],
     defaultCurrency: "PLN" as string,

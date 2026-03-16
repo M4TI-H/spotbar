@@ -6,7 +6,7 @@ const modalStore = useModalStore();
 <template>
   <div class="relative">
     <MenuItemForm v-if="menuItemStore.isOpened" />
-    <div class="p-4">
+    <div class="sm:p-4 bg-stone-700 min-h-screen">
       <slot />
     </div>
     <div

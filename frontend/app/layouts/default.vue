@@ -5,7 +5,7 @@ import Navigation from "~/components/Navigation.vue";
 <template>
   <div class="relative">
     <Navigation />
-    <div class="p-4 sm:px-12 bg-neutral-100">
+    <div class="p-4 sm:px-12 bg-stone-800">
       <slot />
     </div>
   </div>

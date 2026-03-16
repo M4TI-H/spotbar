@@ -1,15 +1,139 @@
 <script setup lang="ts">
 import type ImagePreview from "~/models/ImagePreview";
+import type MenuItem from "~/models/MenuItem";
+import type Section from "~/models/Section";
 
 const expand = ref<boolean>(false);
 const previews = ref<ImagePreview[]>([]);
 const isUploading = ref<boolean>(false);
 const uploadProgress = ref<number>(0);
-const files = ref<File[] | null>(null);
 
-const emit = defineEmits<{
-  (e: "upload", value: File[]): void;
-}>();
+const menuStore = useMenuStore();
+const isProcessing = ref<boolean>(false);
+
+const loadSampleMenu = async () => {
+  isProcessing.value = true;
+
+  const menuId = crypto.randomUUID();
+  const sectionId1 = crypto.randomUUID();
+  const sectionId2 = crypto.randomUUID();
+
+  const sampleSections: Section[] = [
+    {
+      id: sectionId1,
+      menu_id: menuId,
+      name: "Luxury & Vintage Cocktails",
+      description:
+        "Exclusive spirits and rare ingredients from around the world.",
+      position: 1,
+    },
+    {
+      id: sectionId2,
+      menu_id: menuId,
+      name: "Reinvented Classics",
+      description: "Your favorite classics with a modern, local twist.",
+      position: 2,
+    },
+  ];
+
+  const sampleItems: MenuItem[] = [
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId1,
+      category_id: "cat_01",
+      name: "Legendary Brown Spirits Long Island",
+      price: 99,
+      position: 2,
+      ingredients: [
+        "Wild Turkey Rare Bread",
+        "Remy Martin VSOP",
+        "Casamigos Reposado",
+        "Cola",
+      ],
+      description:
+        "Extremely strong and sophisticated blend of premium spirits.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId1,
+      category_id: "cat_01",
+      name: "Ultimate Negroni",
+      price: 69,
+      position: 1,
+      ingredients: [
+        "Bareksten Botanical Gin",
+        "Campari Cask Tale",
+        "9Didante Vermouth",
+      ],
+      description: "Aged in oak barrels for extra smoothness.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId2,
+      category_id: "cat_01",
+      name: "Gdańsk & Stormy",
+      price: 43,
+      position: 2,
+      ingredients: [
+        "Angostura 5yo Rum",
+        "Goldwasser",
+        "Ginger Beer",
+        "Citrus",
+        "Smoke",
+      ],
+      description:
+        "A tribute to the local history with a touch of gold flakes.",
+      metadata: { hidden_attrs: [] },
+    },
+    {
+      id: crypto.randomUUID(),
+      section_id: sectionId2,
+      category_id: "cat_01",
+      name: "Basil Gimlet",
+      price: 42,
+      position: 1,
+      ingredients: ["Citadelle Gin", "Basil", "Lime", "Lime leaves"],
+      description: "Fresh, herbal and perfectly balanced sour.",
+      metadata: { hidden_attrs: [] },
+    },
+  ];
+
+  menuStore.setSections(sampleSections);
+  menuStore.addToMenu(sampleItems);
+
+  isProcessing.value = false;
+  console.log("Sample data with UUIDs loaded successfully.");
+};
+
+const uploadPhotos = async (files: File[]) => {
+  if (!files || files.length === 0) return;
+
+  isProcessing.value = true;
+
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("file", file);
+  });
+
+  try {
+    const response = await $fetch<{ status: string; data: MenuItem[] }>(
+      "http://127.0.0.1:8000/processor/upload",
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+
+    isProcessing.value = false;
+    menuStore.addToMenu(response.data);
+
+    console.log("Otrzymane menu:", response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 //generates hash from image's content, used to prevent duplicates
 const generateFileHash = async (file: File): Promise<string> => {
@@ -70,7 +194,8 @@ const handleEmitUpload = () => {
 
   if (unprocessedPreviews.length > 0) {
     const filesToUpload = unprocessedPreviews.map((p) => p.file);
-    emit("upload", filesToUpload);
+    // uploadPhotos(filesToUpload);
+    loadSampleMenu();
     unprocessedPreviews.forEach((p) => (p.wasProcessed = true));
   }
 };
@@ -81,51 +206,67 @@ onUnmounted(() => {
 </script>
 <template>
   <div
-    :class="expand ? 'max-h-fit' : 'max-h-min'"
-    class="relative w-full max-w-md flex flex-col gap-4 overflow-hidden transition-all duration-100 ease-in-out"
+    class="relative w-full flex flex-col gap-4 overflow-hidden transition-all duration-100 ease-in-out"
   >
     <div class="flex flex-col">
-      <h2 class="sm:text-lg font-semibold text-gray-600">Image Scanner</h2>
-      <p class="text-sm sm:text-base text-gray-400">
+      <h1 class="md:text-xl text-stone-300 font-semibold tracking-wider">
+        Image scanner
+      </h1>
+      <p class="text-sm sm:text-base text-stone-400">
         Upload photos to create a digital version
       </p>
     </div>
-    <label
-      class="flex items-center justify-center w-full py-1 sm:py-2 bg-gray-100 border border-gray-300 rounded-md select-none hover:bg-gray-200 cursor-pointer transition-colors"
-    >
-      <input
-        type="file"
-        multiple
-        @change="handleUploadPreview"
-        class="hidden"
-        accept="image/*"
-      />
-      <p class="text-sm text-gray-500">Upload</p>
-    </label>
-    <div class="flex flex-col gap-1">
-      <div
-        v-if="isUploading"
-        class="w-full h-4 bg-gray-300 rounded-sm overflow-hidden text-[10px] flex items-center justify-center relative"
+    <div class="w-full flex flex-col items-center gap-6">
+      <label
+        class="flex items-center justify-center w-full max-w-md py-2 border border-stone-700 rounded-md hover:border-emerald-500 hover:bg-stone-700 select-none cursor-pointer transition-colors"
       >
-        <div
-          class="absolute left-0 top-0 h-full bg-emerald-400 transition-all duration-300 ease-out"
-          :style="{ width: `${uploadProgress}%` }"
-        ></div>
-        <span v-if="isUploading" class="z-10 font-bold text-emerald-900">
-          {{ uploadProgress }}%
-        </span>
+        <input
+          type="file"
+          multiple
+          @change="handleUploadPreview"
+          class="hidden"
+          accept="image/*"
+        />
+        <p class="text-sm text-stone-400">Select files from computer</p>
+      </label>
+
+      <div class="hidden md:flex items-center justify-center flex-col">
+        <i
+          class="pi pi-cloud-upload border-2 text-stone-400 border-emerald-500 rounded-xl p-8 text-4xl"
+        ></i>
+        <p class="mt-4 text-stone-400 text-sm">
+          Drag and drop files here to upload.
+        </p>
       </div>
 
-      <button
-        @click="handleEmitUpload"
-        v-if="previews.length > 0"
-        class="flex items-center justify-center w-full py-1 sm:py-2 text-sm text-gray-50 bg-gray-400 rounded-md select-none hover:bg-gray-500 cursor-pointer transition-colors"
-      >
-        Convert to text
-      </button>
-      <p v-if="previews.length > 0" class="text-sm text-gray-400 self-end mr-1">
-        Selected images: {{ previews.length }}
-      </p>
+      <div class="w-full max-w-md flex flex-col gap-1 mt-4">
+        <div
+          v-if="isUploading"
+          class="w-full h-4 bg-gray-300 rounded-sm overflow-hidden text-[10px] flex items-center justify-center relative"
+        >
+          <div
+            class="absolute left-0 top-0 h-full bg-emerald-400 transition-all duration-300 ease-out"
+            :style="{ width: `${uploadProgress}%` }"
+          ></div>
+          <span v-if="isUploading" class="z-10 font-bold text-emerald-900">
+            {{ uploadProgress }}%
+          </span>
+        </div>
+
+        <button
+          @click="handleEmitUpload"
+          v-if="previews.length > 0"
+          class="flex items-center justify-center w-full py-2 text-sm text-stone-300 bg-emerald-500 rounded-md select-none hover:bg-emerald-600 cursor-pointer transition-colors"
+        >
+          Convert to text
+        </button>
+        <p
+          v-if="previews.length > 0"
+          class="text-sm text-gray-400 self-end mr-1"
+        >
+          Selected images: {{ previews.length }}
+        </p>
+      </div>
     </div>
 
     <template v-if="previews.length > 0">
