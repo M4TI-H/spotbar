@@ -51,46 +51,56 @@ const groupedMenu = computed(() => {
 <template>
   <div
     v-if="menuStore.menuItems"
-    class="w-full h-min flex flex-col px-2 pt-3 pb-5 gap-4 border border-gray-300 rounded-md"
+    class="w-full h-min flex flex-col md:px-2 gap-4"
   >
-    <div class="w-full flex items-center overflow-x-auto pb-2">
+    <div class="w-full flex items-center overflow-x-auto pb-2 gap-4 md:gap-2">
       <AddSectionBtn />
-      <button
-        @click="activeSection = 'all'"
-        class="relative px-4 pb-1 text-gray-600 whitespace-nowrap cursor-pointer"
+      <div class="py-6 md:py-4 w-px bg-stone-400"></div>
+      <div
+        class="scrollbar-hide w-full flex items-center overflow-x-auto whitespace-nowrap gap-2"
       >
-        All
-        <span
-          v-if="activeSection === 'all'"
-          class="absolute bottom-0 left-0 w-full h-px bg-gray-600"
-        ></span>
-      </button>
-      <button
-        v-for="(sect, idx) in sectionList"
-        :key="idx"
-        @click="activeSection = sect.id"
-        class="relative px-4 pb-1 text-gray-600 whitespace-nowrap cursor-pointer"
-      >
-        {{ sect.name }}
-        <span
-          v-if="activeSection === sect.id"
-          class="absolute bottom-0 left-0 w-full h-px bg-gray-600"
-        ></span>
-      </button>
+        <button
+          @click="activeSection = 'all'"
+          class="relative px-4 py-2 md:py-2 text-lg md:text-base rounded-md whitespace-nowrap cursor-pointer transition-colors"
+          :class="[
+            activeSection === 'all'
+              ? 'text-stone-300 bg-stone-600 hover:bg-stone-600/80'
+              : 'text-stone-500 hover:bg-stone-700 hover:text-stone-400 active:bg-stone-700 active:text-stone-400',
+          ]"
+        >
+          All sections
+        </button>
+        <button
+          v-for="(sect, idx) in sectionList"
+          :key="idx"
+          @click="activeSection = sect.id"
+          class="relative px-4 py-2 md:py-2 text-lg md:text-base rounded-md whitespace-nowrap cursor-pointer transition-colors"
+          :class="[
+            activeSection === sect.id
+              ? 'text-stone-300 bg-stone-600 hover:bg-stone-600/80'
+              : 'text-stone-500 hover:bg-stone-700 hover:text-stone-400 active:bg-stone-700 active:text-stone-400',
+          ]"
+        >
+          {{ sect.name }}
+        </button>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 overflow-y-auto">
       <div
         v-for="section in groupedMenu"
         :key="section.id"
-        class="flex flex-col gap-2"
+        class="flex flex-col"
       >
         <Section :section="section" />
       </div>
     </div>
-    <NewSectionField />
+    <!-- <NewSectionField v-if="activeSection === 'all'" /> -->
 
-    <p v-if="filteredMenu.length === 0" class="text-center text-gray-400 py-10">
+    <p
+      v-if="menuStore.sections.length == 0"
+      class="text-center text-stone-400 py-10"
+    >
       No items found.
     </p>
   </div>

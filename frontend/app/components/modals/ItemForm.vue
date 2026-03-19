@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import type MenuItem from "~/models/MenuItem";
-import EditableField from "../EditableFields/EditableField.vue";
-import SelectSection from "./SelectSection.vue";
-import SelectCategory from "./SelectCategory.vue";
-import CustomAttributeField from "./CustomAttributeField.vue";
 import type { CustomAttribute } from "~/models/MenuItem";
-import HiddenAttributes from "./HiddenAttributes.vue";
+import SelectSection from "../menu/Item/SelectSection.vue";
+import SelectCategory from "../menu/Item/SelectCategory.vue";
+import EditableField from "../menu/EditableFields/EditableField.vue";
+import CustomAttributeField from "../menu/Item/CustomAttributeField.vue";
+import HiddenAttributes from "../menu/Item/HiddenAttributes.vue";
 
 const menuItemStore = useMenuItemStore();
 const menuStore = useMenuStore();
+const modalStore = useModalStore();
+
+const props = defineProps<{
+  data?: any;
+}>();
 
 const isSimpleField = (value: any) => {
   if (value === null) return true;
@@ -245,7 +250,7 @@ const saveChanges = async () => {
     pendingAttributeDeletions.value = [];
     pendingAttributeDuplications.value = [];
 
-    menuItemStore.close();
+    modalStore.close();
   } catch (err: any) {
     console.error("Save failed:", err);
   }
@@ -258,7 +263,7 @@ const getFieldType = (value: any) => {
 
 //initial values copy
 watch(
-  () => menuItemStore.data,
+  () => props.data,
   (newData) => {
     if (newData) {
       const copy = JSON.parse(JSON.stringify(newData));
@@ -301,87 +306,84 @@ onMounted(() => {
 </script>
 
 <template>
-  <section
-    class="w-screen h-screen z-100 fixed bg-black/40 flex items-center justify-center p-4"
+  <div
+    v-if="localData"
+    class="w-full max-w-4xl bg-stone-800 border border-stone-700 rounded-xl flex flex-col z-50 max-h-[90vh] md:max-h-320"
   >
     <div
-      v-if="localData"
-      class="w-full max-w-4xl bg-white border border-gray-400 rounded-md flex flex-col p-4"
+      class="flex items-center justify-between border-b border-stone-700 p-3 md:p-4"
     >
-      <div class="flex items-center justify-between">
-        <h1 class="text-xl font-semibold text-gray-800">
-          {{ initialName ? `Modifying ${initialName}` : "New menu item" }}
-        </h1>
-        <button
-          @click="menuItemStore.close()"
-          class="hover:bg-gray-100 px-1 rounded-md transition-colors cursor-pointer"
-        >
-          <i class="pi pi-times text-gray-400 text-sm"></i>
-        </button>
-      </div>
-
-      <div class="overflow-y-auto max-h-[80vh] mt-2">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SelectSection v-model="localData.section_id" />
-          <SelectCategory v-model="localData.category_id" />
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <template v-for="(value, key) in localData" :key="key">
-            <EditableField
-              v-if="
-                !localData.metadata?.hidden_attrs?.includes(String(key)) &&
-                isSimpleField(value) &&
-                key !== 'id' &&
-                key !== 'section_id' &&
-                key !== 'category_id' &&
-                key !== 'position' &&
-                key !== 'description' &&
-                key !== 'ingredients' &&
-                key !== 'metadata'
-              "
-              :item_id="localData.id"
-              :label="String(key)"
-              :type="getFieldType(value)"
-              :suffix="getSuffix(String(key))"
-              :section_id="localData.section_id"
-              v-model="localData[key]"
-              @attributeAction="handleAttributeAction"
-            />
-          </template>
-
-          <MenuEditableFieldsDescription v-model="localData.description" />
-
-          <MenuEditableFieldsIngredients v-model="localData.ingredients" />
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-6 py-4">
-        <CustomAttributeField @addAttribute="addCustomField" />
-        <HiddenAttributes
-          v-if="localData.metadata?.hidden_attrs?.length"
-          :attributes="hiddenAttributesList"
-          :section_id="localData.section_id!"
-          @unhide="handleAttributeAction"
-        />
-      </div>
-
-      <div
-        class="px-6 py-2 border-t border-gray-200 flex justify-end gap-3 mt-4"
+      <h1 class="md:text-xl font-semibold text-stone-300 max-w-[70vw] truncate">
+        {{ initialName ? `Modifying ${initialName}` : "New menu item" }}
+      </h1>
+      <button
+        @click="modalStore.close()"
+        class="hover:bg-stone-900/40 px-1 rounded-md transition-colors cursor-pointer"
       >
-        <button
-          @click="menuItemStore.close()"
-          class="hover:bg-gray-100 text-gray-400 px-3 rounded-md transition-colors cursor-pointer"
-        >
-          Cancel
-        </button>
-        <button
-          @click="saveChanges"
-          class="px-8 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-all font-semibold text-sm cursor-pointer"
-        >
-          Save Changes
-        </button>
+        <i class="pi pi-times text-stone-300 text-sm"></i>
+      </button>
+    </div>
+
+    <div class="p-4 overflow-y-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SelectSection v-model="localData.section_id" />
+        <SelectCategory v-model="localData.category_id" />
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-4">
+        <template v-for="(value, key) in localData" :key="key">
+          <EditableField
+            v-if="
+              !localData.metadata?.hidden_attrs?.includes(String(key)) &&
+              isSimpleField(value) &&
+              key !== 'id' &&
+              key !== 'section_id' &&
+              key !== 'category_id' &&
+              key !== 'position' &&
+              key !== 'description' &&
+              key !== 'ingredients' &&
+              key !== 'metadata'
+            "
+            :item_id="localData.id"
+            :label="String(key)"
+            :type="getFieldType(value)"
+            :suffix="getSuffix(String(key))"
+            :section_id="localData.section_id"
+            v-model="localData[key]"
+            @attributeAction="handleAttributeAction"
+          />
+        </template>
+
+        <MenuEditableFieldsDescription v-model="localData.description" />
+        <MenuEditableFieldsIngredients v-model="localData.ingredients" />
       </div>
     </div>
-  </section>
+
+    <div class="flex flex-col gap-6">
+      <CustomAttributeField @addAttribute="addCustomField" />
+      <HiddenAttributes
+        v-if="localData.metadata?.hidden_attrs?.length"
+        :attributes="hiddenAttributesList"
+        :section_id="localData.section_id!"
+        @unhide="handleAttributeAction"
+      />
+    </div>
+
+    <div
+      class="px-2 md:px-6 py-3 md:py-2 border-t border-stone-700 flex justify-center md:justify-end gap-3"
+    >
+      <button
+        @click="modalStore.close()"
+        class="px-8 py-3 md:py-2 w-1/3 md:w-auto bg-stone-700 text-white rounded-md hover:bg-stone-600/90 transition-all font-semibold text-sm cursor-pointer"
+      >
+        Cancel
+      </button>
+      <button
+        @click="saveChanges"
+        class="px-8 py-3 md:py-2 w-2/3 md:w-auto bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-all font-semibold text-sm cursor-pointer"
+      >
+        Save Changes
+      </button>
+    </div>
+  </div>
 </template>

@@ -24,16 +24,16 @@ const ingredientsCount = computed(() => {
 
 const counterClass = computed(() => {
   const count = ingredientsCount.value;
-  if (count > 40) return "text-red-500 font-bold";
-  if (count > 20) return "text-amber-500 font-bold";
-  return "text-gray-400 font-medium";
+  if (count > 40) return "text-red-500";
+  if (count > 20) return "text-amber-500";
+  return "text-stone-300";
 });
 </script>
 <template>
-  <div class="md:col-span-3 flex flex-col gap-1">
+  <div class="col-span-1 md:col-span-2 xl:col-span-3 flex flex-col gap-1">
     <div class="w-full flex items-center justify-between">
       <label
-        class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider ml-1"
+        class="text-xs lg:text-sm ml-1 font-semibold capitalize text-stone-400"
         >Ingredients</label
       >
     </div>
@@ -42,7 +42,7 @@ const counterClass = computed(() => {
       <textarea
         v-model="displayValue"
         placeholder="e.g. Gin, Tonic, Lime, Ice"
-        class="w-full px-3 pt-2 pb-3 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 h-20 text-sm resize-none"
+        class="w-full px-3 pt-2 pb-3 border border-stone-700 rounded-md focus:border-emerald-600 outline-0 transition-all h-20 text-sm text-stone-300 resize-none shadow-lg"
         :class="{
           'focus:border-amber-300': ingredientsCount > 20,
           'focus:border-red-300': ingredientsCount > 40,

@@ -71,13 +71,13 @@ const handleAction = (payload: {
 
 <template>
   <div class="flex flex-col gap-0.5">
-    <div class="w-full flex items-center justify-between px-1">
+    <div class="w-full flex items-center justify-between px-1 shadow-lg">
       <div class="relative w-fit flex items-center gap-1">
         <div
           v-if="hoverWarning"
           class="absolute px-2 py-1 ml-2 mb-9 rounded-md bg-black/50"
         >
-          <p class="text-[10px] text-white whitespace-nowrap">
+          <p class="text-xs text-white whitespace-nowrap">
             {{ errorMessage }}
           </p>
         </div>
@@ -88,7 +88,7 @@ const handleAction = (payload: {
           class="pi pi-exclamation-circle text-xs text-red-500"
         ></i>
         <label
-          class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider"
+          class="text-xs lg:text-sm font-semibold capitalize text-stone-400"
           :class="{ 'text-red-500': errorWarning }"
           >{{ label.replace("_", " ") }}</label
         >
@@ -96,9 +96,9 @@ const handleAction = (payload: {
 
       <button
         @click="toggleOptions"
-        class="hover:bg-gray-100 px-1 rounded-md transition-colors cursor-pointer"
+        class="hover:bg-stone-900/40 active:bg-stone-900/40 px-1 rounded-md transition-colors cursor-pointer"
       >
-        <i class="pi pi-ellipsis-h text-xs text-gray-400"></i>
+        <i class="pi pi-ellipsis-h text-xs text-stone-400"></i>
       </button>
       <PopoverOptions
         ref="popoverRef"

@@ -5,15 +5,13 @@ const menuStore = useMenuStore();
 </script>
 <template>
   <div class="flex flex-col pt-1 gap-1.5">
-    <div class="w-full flex items-center justify-between px-1">
-      <label
-        class="text-[10px] font-semibold uppercase text-gray-400 tracking-wider"
-        >Menu Section</label
-      >
-    </div>
+    <label
+      class="text-xs lg:text-sm font-semibold capitalize text-stone-400 ml-1"
+      >Menu Section</label
+    >
     <select
       v-model="model"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm text-gray-700"
+      class="w-full px-3 py-2 border border-stone-700 rounded-md focus:border-emerald-600 outline-0 transition-all text-sm text-stone-300 shadow-lg"
     >
       <option
         v-for="section in menuStore.sections"

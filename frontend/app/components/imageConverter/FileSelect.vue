@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Divider } from "primevue";
 import type ImagePreview from "~/models/ImagePreview";
 import type MenuItem from "~/models/MenuItem";
 import type Section from "~/models/Section";
@@ -217,6 +218,17 @@ onUnmounted(() => {
       </p>
     </div>
     <div class="w-full flex flex-col items-center gap-6">
+      <div class="hidden md:flex items-center justify-center flex-col">
+        <i
+          class="pi pi-cloud-upload border-2 text-stone-400 border-emerald-500 rounded-xl p-8 text-4xl"
+        ></i>
+        <p class="mt-4 text-stone-400 text-sm">
+          Drag and drop files here to upload.
+        </p>
+      </div>
+
+      <p class="text-stone-600">Or</p>
+
       <label
         class="flex items-center justify-center w-full max-w-md py-2 border border-stone-700 rounded-md hover:border-emerald-500 hover:bg-stone-700 select-none cursor-pointer transition-colors"
       >
@@ -227,17 +239,8 @@ onUnmounted(() => {
           class="hidden"
           accept="image/*"
         />
-        <p class="text-sm text-stone-400">Select files from computer</p>
+        <p class="text-sm text-stone-400">Select files from device</p>
       </label>
-
-      <div class="hidden md:flex items-center justify-center flex-col">
-        <i
-          class="pi pi-cloud-upload border-2 text-stone-400 border-emerald-500 rounded-xl p-8 text-4xl"
-        ></i>
-        <p class="mt-4 text-stone-400 text-sm">
-          Drag and drop files here to upload.
-        </p>
-      </div>
 
       <div class="w-full max-w-md flex flex-col gap-1 mt-4">
         <div

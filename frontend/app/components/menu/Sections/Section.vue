@@ -2,7 +2,7 @@
 import SectionForm from "~/components/modals/SectionForm.vue";
 import type MenuItem from "~/models/MenuItem";
 import type Section from "~/models/Section";
-import NewItemBtutton from "../NewItemBtutton.vue";
+import NewItemButton from "../NewItemButton.vue";
 
 const modalStore = useModalStore();
 
@@ -23,26 +23,44 @@ const handleOpenSectionForm = () => {
 };
 </script>
 <template>
-  <div class="flex items-center gap-4 pr-2">
-    <button
-      @click="handleOpenSectionForm"
-      class="text-xl font-bold flex items-center gap-2 text-gray-700 uppercase tracking-wider whitespace-nowrap cursor-pointer hover:bg-gray-100 px-2 rounded-md group transi"
+  <div class="flex flex-col mb-4">
+    <div class="flex items-center justify-between gap-2 pr-2">
+      <h1
+        @click="handleOpenSectionForm"
+        class="min-w-fit sm:text-lg md:text-xl font-bold text-stone-300 uppercase truncate tracking-wider cursor-pointer hover:bg-stone-900/30 active:bg-stone-900/30 p-2 md:px-4 rounded-md transition-colors flex-1"
+      >
+        {{ section.name }}
+      </h1>
+
+      <div class="hidden md:flex w-full h-0.5 bg-stone-700"></div>
+
+      <div class="shrink-0">
+        <NewItemButton :section_id="section.id" />
+      </div>
+    </div>
+
+    <p
+      v-if="section.description"
+      class="text-sm md:text-base text-stone-500 px-4 md:px-8 leading-relaxed italic"
     >
-      {{ section.name }}
-      <span class="hidden text-sm group-hover:inline text-gray-700"
-        ><i class="pi pi-pencil"></i
-      ></span>
-    </button>
-    <div class="w-full h-px bg-gray-300"></div>
-    <NewItemBtutton :section_id="section.id" />
+      {{ section.description }}
+    </p>
   </div>
-  <p class="text-sm text-gray-400 px-3">{{ section.description }}</p>
-  <div class="grid grid-cols-1 gap-4 mt-2 px-2">
+
+  <div class="grid grid-cols-1 gap-4 px-2">
     <MenuItem
       v-for="item in section.items"
       :key="item.id"
       :item="item"
       :sectionLength="section.items.length"
     />
+
+    <div
+      v-if="section.items.length === 0"
+      class="flex items-center justify-center flex-col py-10 border-2 border-dashed border-stone-800 rounded-2xl"
+    >
+      <i class="pi pi-inbox text-stone-600 text-3xl mb-3"></i>
+      <p class="text-stone-500 text-sm font-medium">No items in this section</p>
+    </div>
   </div>
 </template>

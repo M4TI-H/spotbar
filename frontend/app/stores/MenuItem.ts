@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
+import ItemForm from "~/components/modals/ItemForm.vue";
 import type MenuItem from "~/models/MenuItem";
 
 export const useMenuItemStore = defineStore("menuItem", {
   state: () => ({
-    isOpened: false as boolean,
     data: null as MenuItem | null,
     changesMade: false as boolean,
   }),
@@ -18,15 +18,9 @@ export const useMenuItemStore = defineStore("menuItem", {
       },
   },
   actions: {
-    openToEdit(data: MenuItem) {
-      this.isOpened = true;
-      this.data = data;
-      if (!this.data.metadata) {
-        this.data.metadata = { hidden_fields: [] };
-      }
-    },
-    openEmpty(sectionId?: string) {
+    openEmptyForm(sectionId?: string) {
       const menuStore = useMenuStore();
+      const modalStore = useModalStore();
       const sectionItems = menuStore.menuItems.filter(
         (i) => i.section_id === sectionId,
       );
@@ -36,7 +30,6 @@ export const useMenuItemStore = defineStore("menuItem", {
           ? Math.max(...sectionItems.map((i) => i.position)) + 1
           : 1;
 
-      this.isOpened = true;
       this.data = {
         id: crypto.randomUUID(),
         section_id: sectionId || "",
@@ -50,12 +43,12 @@ export const useMenuItemStore = defineStore("menuItem", {
           hidden_attrs: [],
         },
       };
-    },
 
-    close() {
-      this.isOpened = false;
-      this.data = null;
+      const emptyItemData = this.data;
+
+      modalStore.open(ItemForm, {
+        data: emptyItemData,
+      });
     },
-    hideAttribute(attribute: string) {},
   },
 });

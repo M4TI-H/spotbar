@@ -57,11 +57,11 @@ const buttonAction = (scope: "item" | "section" | "menu") => {
 <template>
   <Popover ref="popover">
     <div
-      class="flex flex-col w-44 bg-white rounded-md border border-gray-300 shadow-lg"
+      class="flex flex-col w-44 bg-stone-800 rounded-md border border-stone-700 shadow-lg"
     >
       <button
         @mouseenter="showInternal($event, 'duplicate')"
-        class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+        class="w-full py-2 px-3 rounded-b-md text-left text-xs text-stone-400 hover:bg-stone-900/40 hover:text-stone-300 active:text-stone-300 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
       >
         <i class="pi pi-clone"></i>
 
@@ -74,7 +74,7 @@ const buttonAction = (scope: "item" | "section" | "menu") => {
       <button
         v-if="!requiredType"
         @mouseenter="showInternal($event, 'hide')"
-        class="w-full py-2 px-3 text-left text-xs text-gray-500 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+        class="w-full py-2 px-3 text-left text-xs text-stone-400 hover:bg-stone-900/40 hover:text-stone-300 active:text-stone-300 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
       >
         <i class="pi pi-eye-slash"></i>
         <div class="w-full flex items-center justify-between min-w-0">
@@ -85,7 +85,7 @@ const buttonAction = (scope: "item" | "section" | "menu") => {
       <button
         v-if="!requiredType"
         @mouseenter="showInternal($event, 'delete')"
-        class="w-full py-2 px-3 rounded-b-md text-left text-xs text-red-500 bg-red-100 hover:bg-red-200 flex items-center gap-2 cursor-pointer"
+        class="w-full py-2 px-3 rounded-b-md text-left text-xs text-red-500 hover:bg-stone-900/40 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
       >
         <i class="pi pi-trash"></i>
         <div class="w-full flex items-center justify-between min-w-0">
@@ -96,24 +96,24 @@ const buttonAction = (scope: "item" | "section" | "menu") => {
     </div>
     <Popover ref="internalPopover" :pt="{ root: { class: 'ml-44' } }">
       <div
-        class="flex flex-col max-w-64 bg-white rounded-md border border-gray-300 shadow-lg"
+        class="flex flex-col max-w-64 bg-stone-800 rounded-md border border-stone-700 shadow-lg"
       >
         <button
           @click="buttonAction('item')"
           v-if="popoverMode !== 'duplicate'"
-          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-stone-400 hover:bg-stone-900/40 hover:text-stone-300 active:text-stone-300 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
         >
           This item only
         </button>
         <button
           @click="buttonAction('menu')"
-          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-stone-400 hover:bg-stone-900/40 hover:text-stone-300 active:text-stone-300 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
         >
           Whole menu
         </button>
         <button
           @click="buttonAction('section')"
-          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-gray-500 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2 cursor-pointer"
+          class="w-full py-2 px-3 rounded-b-md text-left text-xs text-stone-400 hover:bg-stone-900/40 hover:text-stone-300 active:text-stone-300 active:bg-stone-900/40 flex items-center gap-2 cursor-pointer"
         >
           <span class="font-semibold text-emerald-600 truncate">
             {{ menuStore.sections.find((s) => s.id === section_id)?.name }}

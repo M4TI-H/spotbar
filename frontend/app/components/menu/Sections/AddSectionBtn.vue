@@ -14,8 +14,9 @@ const handleAddSectionClick = () => {
 <template>
   <button
     @click="handleAddSectionClick"
-    class="relative px-2 pb-1 text-gray-600 rounded-md hover:bg-gray-100 font-semibold whitespace-nowrap cursor-pointer mr-2 transition-colors"
+    class="relative px-3 py-3 md:py-2 flex items-center gap-2 text-stone-300 bg-emerald-600 hover:bg-emerald-600/80 active:bg-emerald-600/80 rounded-md whitespace-nowrap cursor-pointer transition-colors"
   >
-    +
+    <i class="pi pi-plus-circle text-lg md:text-base"></i>
+    <span class="hidden md:flex">New section</span>
   </button>
 </template>

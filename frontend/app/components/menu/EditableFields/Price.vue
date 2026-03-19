@@ -59,15 +59,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative w-full">
+  <div class="relative w-full shadow-lg">
     <input
       :value="displayValue"
       @input="handleInput"
       @blur="formatOnBlur"
       @focus="selectAll"
-      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-emerald-500 outline-0 transition-all text-sm text-gray-700"
+      class="w-full px-3 py-2 border border-stone-700 rounded-md focus:border-emerald-600 outline-0 transition-all text-sm text-stone-300"
       :class="{
-        'text-red-500 border-red-300 bg-red-100': error,
+        'border-red-400! focus:border-red-500': error,
         'pr-12': suffix,
       }"
       type="text"
@@ -76,9 +76,9 @@ onMounted(() => {
     />
     <div
       v-if="suffix"
-      class="absolute inset-y-0 right-0 px-2 max-w-12 flex items-center pointer-events-none bg-gray-200 rounded-r-md border border-gray-300"
+      class="absolute inset-y-0 right-0 px-2 max-w-12 flex items-center pointer-events-none bg-stone-600 rounded-r-md border border-stone-700"
     >
-      <p class="text-sm font-semibold text-gray-400 lowercase tracking-tighter">
+      <p class="text-sm text-stone-400 lowercase tracking-tighter">
         {{
           suffix === menuStore.defaultCurrency
             ? getCurrencySymbol(suffix)
