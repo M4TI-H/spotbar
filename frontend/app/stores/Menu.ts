@@ -13,12 +13,42 @@ export const useMenuStore = defineStore("menu", {
     categories: [] as Category[],
     isLoadingCategories: false as boolean,
   }),
+
+  persist: true,
+
   actions: {
     addToMenu(newItems: MenuItem[]) {
       this.menuItems = [...this.menuItems, ...newItems];
     },
     setSections(sections: Section[]) {
       this.sections = sections;
+    },
+    reorderSections(sectionId: string, newPosition: number) {
+      const section = this.sections.find((s) => s.id === sectionId);
+      if (!section) return;
+
+      const oldPosition = section.position;
+
+      this.sections.forEach((s) => {
+        if (s.id === sectionId) return;
+
+        //push up
+        if (
+          newPosition < oldPosition &&
+          s.position >= newPosition &&
+          s.position < oldPosition
+        ) {
+          s.position += 1;
+        }
+        //push down
+        else if (
+          newPosition > oldPosition &&
+          s.position <= newPosition &&
+          s.position > oldPosition
+        ) {
+          s.position -= 1;
+        }
+      });
     },
     saveSection(sectionData: Section) {
       try {
@@ -61,33 +91,7 @@ export const useMenuStore = defineStore("menu", {
       this.menuItems = this.menuItems.filter((item) => item.section_id !== id);
       this.sections = this.sections.filter((item) => item.id !== id);
     },
-    reorderSections(sectionId: string, newPosition: number) {
-      const section = this.sections.find((s) => s.id === sectionId);
-      if (!section) return;
 
-      const oldPosition = section.position;
-
-      this.sections.forEach((s) => {
-        if (s.id === sectionId) return;
-
-        //push up
-        if (
-          newPosition < oldPosition &&
-          s.position >= newPosition &&
-          s.position < oldPosition
-        ) {
-          s.position += 1;
-        }
-        //push down
-        else if (
-          newPosition > oldPosition &&
-          s.position <= newPosition &&
-          s.position > oldPosition
-        ) {
-          s.position -= 1;
-        }
-      });
-    },
     reorderItems(itemId: string, step: number) {
       const item = this.menuItems.find((i) => i.id === itemId);
       if (!item) return;

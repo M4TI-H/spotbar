@@ -16,7 +16,7 @@ const model = defineModel<string>();
         placeholder="Describe this item..."
       ></textarea>
       <p
-        class="absolute bottom-3 right-3 text-xs text-stone-600 pointer-events-none"
+        class="absolute bottom-3 right-3 text-xs text-stone-300 pointer-events-none"
       >
         {{ model?.length }}/200
       </p>
